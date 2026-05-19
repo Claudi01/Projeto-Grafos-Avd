@@ -1,31 +1,61 @@
 origem,destino,tipo_conexao,justificativa,peso
-REC,SSA,regional,"Conexão entre aeroportos da mesma região Nordeste",1.0
-REC,FOR,regional,"Conexão entre aeroportos da mesma região Nordeste",1.0
-REC,NAT,regional,"Conexão entre aeroportos da mesma região Nordeste",1.0
-REC,JPA,regional,"Conexão entre aeroportos da mesma região Nordeste",1.0
-SSA,FOR,regional,"Conexão entre aeroportos da mesma região Nordeste",1.0
-FOR,NAT,regional,"Conexão entre aeroportos da mesma região Nordeste",1.0
-NAT,JPA,regional,"Conexão entre aeroportos da mesma região Nordeste",1.0
-GRU,CGH,regional,"Conexão entre aeroportos da mesma região Sudeste",1.0
-GRU,GIG,regional,"Conexão entre aeroportos da mesma região Sudeste",1.0
-GIG,CNF,regional,"Conexão entre aeroportos da mesma região Sudeste",1.0
-CNF,VIX,regional,"Conexão entre aeroportos da mesma região Sudeste",1.0
-GRU,CNF,regional,"Conexão entre aeroportos da mesma região Sudeste",1.0
-CWB,FLN,regional,"Conexão entre aeroportos da mesma região Sul",1.0
-CWB,POA,regional,"Conexão entre aeroportos da mesma região Sul",1.0
-FLN,POA,regional,"Conexão entre aeroportos da mesma região Sul",1.0
-MAO,BEL,regional,"Conexão entre aeroportos da mesma região Norte",1.0
-MAO,PVH,regional,"Conexão entre aeroportos da mesma região Norte",1.0
-PVH,RBR,regional,"Conexão entre aeroportos da mesma região Norte",1.0
-BEL,THE,inter-regional,"Conexão estratégica entre Norte e Nordeste",2.5
-BSB,GYN,regional,"Conexão entre aeroportos da mesma região Centro-Oeste",1.0
-REC,GRU,hub,"Conexão entre hub regional do Nordeste e hub nacional do Sudeste",2.0
-SSA,BSB,hub,"Conexão entre capital regional e hub nacional em Brasília",2.0
-FOR,GRU,hub,"Conexão entre aeroporto regional e hub nacional",2.0
-GRU,BSB,hub,"Conexão entre dois hubs nacionais",2.0
-BSB,MAO,inter-regional,"Conexão estratégica entre Centro-Oeste e Norte",2.5
-BSB,CWB,inter-regional,"Conexão estratégica entre Centro-Oeste e Sul",2.5
-GRU,POA,hub,"Conexão entre hub nacional e aeroporto de grande relevância no Sul",2.0
-GIG,REC,hub,"Conexão entre Sudeste e Nordeste por aeroportos de alta relevância",2.0
-BEL,REC,inter-regional,"Conexão estratégica entre Norte e Nordeste",2.5
-MAO,GRU,hub,"Conexão entre Norte e hub nacional de São Paulo",2.0
+REC,SSA,regional,"Conexão regional; peso baseado na distância aproximada de 648.6 km",648.6
+REC,FOR,regional,"Conexão regional; peso baseado na distância aproximada de 627.1 km",627.1
+REC,NAT,regional,"Conexão regional; peso baseado na distância aproximada de 267.0 km",267.0
+REC,JPA,regional,"Conexão regional; peso baseado na distância aproximada de 108.8 km",108.8
+SSA,FOR,regional,"Conexão regional; peso baseado na distância aproximada de 1015.7 km",1015.7
+FOR,NAT,regional,"Conexão regional; peso baseado na distância aproximada de 414.0 km",414.0
+NAT,JPA,regional,"Conexão regional; peso baseado na distância aproximada de 160.5 km",160.5
+GRU,CGH,regional,"Conexão regional; peso baseado na distância aproximada de 28.3 km",28.3
+GRU,GIG,regional,"Conexão regional; peso baseado na distância aproximada de 336.8 km",336.8
+GIG,CNF,regional,"Conexão regional; peso baseado na distância aproximada de 362.0 km",362.0
+CNF,VIX,regional,"Conexão regional; peso baseado na distância aproximada de 391.6 km",391.6
+GRU,CNF,regional,"Conexão regional; peso baseado na distância aproximada de 497.0 km",497.0
+CWB,FLN,regional,"Conexão regional; peso baseado na distância aproximada de 247.2 km",247.2
+CWB,POA,regional,"Conexão regional; peso baseado na distância aproximada de 532.5 km",532.5
+FLN,POA,regional,"Conexão regional; peso baseado na distância aproximada de 370.8 km",370.8
+MAO,BEL,regional,"Conexão regional; peso baseado na distância aproximada de 1295.1 km",1295.1
+MAO,PVH,regional,"Conexão regional; peso baseado na distância aproximada de 761.5 km",761.5
+PVH,RBR,regional,"Conexão regional; peso baseado na distância aproximada de 450.5 km",450.5
+BEL,THE,inter-regional,"Conexão inter-regional estratégica; peso baseado na distância aproximada de 759.4 km",759.4
+BSB,GYN,regional,"Conexão regional; peso baseado na distância aproximada de 160.9 km",160.9
+REC,GRU,hub,"Conexão envolvendo hub aeroportuário (GRU); peso baseado na distância aproximada de 2103.1 km",2103.1
+SSA,BSB,hub,"Conexão envolvendo hub aeroportuário (BSB); peso baseado na distância aproximada de 1082.7 km",1082.7
+FOR,GRU,hub,"Conexão envolvendo hub aeroportuário (GRU); peso baseado na distância aproximada de 2346.8 km",2346.8
+GRU,BSB,hub,"Conexão envolvendo hub aeroportuário (GRU e BSB); peso baseado na distância aproximada de 854.4 km",854.4
+BSB,MAO,hub,"Conexão envolvendo hub aeroportuário (BSB); peso baseado na distância aproximada de 1932.4 km",1932.4
+BSB,CWB,hub,"Conexão envolvendo hub aeroportuário (BSB); peso baseado na distância aproximada de 1076.2 km",1076.2
+GRU,POA,hub,"Conexão envolvendo hub aeroportuário (GRU); peso baseado na distância aproximada de 865.5 km",865.5
+GIG,REC,hub,"Conexão envolvendo hub aeroportuário (GIG); peso baseado na distância aproximada de 1875.3 km",1875.3
+BEL,REC,inter-regional,"Conexão inter-regional estratégica; peso baseado na distância aproximada de 1676.4 km",1676.4
+MAO,GRU,hub,"Conexão envolvendo hub aeroportuário (GRU); peso baseado na distância aproximada de 2686.8 km",2686.8
+SSA,NAT,regional,"Conexão regional; peso baseado na distância aproximada de 879.2 km",879.2
+SSA,JPA,regional,"Conexão regional; peso baseado na distância aproximada de 741.9 km",741.9
+SSA,THE,regional,"Conexão regional; peso baseado na distância aproximada de 998.4 km",998.4
+FOR,BSB,hub,"Conexão envolvendo hub aeroportuário (BSB); peso baseado na distância aproximada de 1686.6 km",1686.6
+FOR,BEL,inter-regional,"Conexão inter-regional estratégica; peso baseado na distância aproximada de 1133.3 km",1133.3
+FOR,THE,regional,"Conexão regional; peso baseado na distância aproximada de 492.3 km",492.3
+NAT,GRU,hub,"Conexão envolvendo hub aeroportuário (GRU); peso baseado na distância aproximada de 2293.0 km",2293.0
+NAT,BSB,hub,"Conexão envolvendo hub aeroportuário (BSB); peso baseado na distância aproximada de 1773.7 km",1773.7
+JPA,GRU,hub,"Conexão envolvendo hub aeroportuário (GRU); peso baseado na distância aproximada de 2214.1 km",2214.1
+JPA,BSB,hub,"Conexão envolvendo hub aeroportuário (BSB); peso baseado na distância aproximada de 1715.9 km",1715.9
+REC,CNF,hub,"Conexão envolvendo hub aeroportuário (CNF); peso baseado na distância aproximada de 1637.9 km",1637.9
+REC,BSB,hub,"Conexão envolvendo hub aeroportuário (BSB); peso baseado na distância aproximada de 1650.5 km",1650.5
+REC,MAO,inter-regional,"Conexão inter-regional estratégica; peso baseado na distância aproximada de 2836.5 km",2836.5
+SSA,GRU,hub,"Conexão envolvendo hub aeroportuário (GRU); peso baseado na distância aproximada de 1449.5 km",1449.5
+SSA,CNF,hub,"Conexão envolvendo hub aeroportuário (CNF); peso baseado na distância aproximada de 949.5 km",949.5
+GRU,VIX,regional,"Conexão regional; peso baseado na distância aproximada de 729.7 km",729.7
+CGH,CNF,regional,"Conexão regional; peso baseado na distância aproximada de 514.5 km",514.5
+CGH,BSB,hub,"Conexão envolvendo hub aeroportuário (CGH e BSB); peso baseado na distância aproximada de 871.2 km",871.2
+GIG,BSB,hub,"Conexão envolvendo hub aeroportuário (GIG e BSB); peso baseado na distância aproximada de 919.4 km",919.4
+GIG,VIX,regional,"Conexão regional; peso baseado na distância aproximada de 412.8 km",412.8
+CNF,BSB,hub,"Conexão envolvendo hub aeroportuário (CNF e BSB); peso baseado na distância aproximada de 592.5 km",592.5
+CNF,CWB,hub,"Conexão envolvendo hub aeroportuário (CNF); peso baseado na distância aproximada de 846.2 km",846.2
+CNF,MAO,hub,"Conexão envolvendo hub aeroportuário (CNF); peso baseado na distância aproximada de 2539.5 km",2539.5
+CNF,BEL,hub,"Conexão envolvendo hub aeroportuário (CNF); peso baseado na distância aproximada de 2087.1 km",2087.1
+BSB,BEL,hub,"Conexão envolvendo hub aeroportuário (BSB); peso baseado na distância aproximada de 1612.4 km",1612.4
+BSB,PVH,hub,"Conexão envolvendo hub aeroportuário (BSB); peso baseado na distância aproximada de 1908.7 km",1908.7
+BSB,RBR,hub,"Conexão envolvendo hub aeroportuário (BSB); peso baseado na distância aproximada de 2264.4 km",2264.4
+BSB,THE,hub,"Conexão envolvendo hub aeroportuário (BSB); peso baseado na distância aproximada de 1324.5 km",1324.5
+GRU,CWB,hub,"Conexão envolvendo hub aeroportuário (GRU); peso baseado na distância aproximada de 359.1 km",359.1
+GRU,FLN,hub,"Conexão envolvendo hub aeroportuário (GRU); peso baseado na distância aproximada de 515.0 km",515.0

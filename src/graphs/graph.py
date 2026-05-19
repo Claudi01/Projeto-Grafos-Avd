@@ -9,8 +9,9 @@ class Graph:
     uma aresta REC -> SSA, também será criada a ligação SSA -> REC.
     """
 
-    def __init__(self, directed=False):
+    def __init__(self, directed=False, allow_negative_weights=False):
         self.directed = directed
+        self.allow_negative_weights = allow_negative_weights
         self._adj = {}
         self._node_attrs = {}
 
@@ -43,9 +44,9 @@ class Graph:
         if origem == destino:
             raise ValueError(f"Aresta inválida: origem e destino iguais ({origem}).")
 
-        if peso < 0:
+        if peso < 0 and not self.allow_negative_weights:
             raise ValueError(
-                "Pesos negativos não são permitidos na Parte 1 do projeto."
+                "Pesos negativos não são permitidos neste grafo. "
             )
 
         if origem not in self._adj:

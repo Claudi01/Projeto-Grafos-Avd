@@ -1,0 +1,8 @@
+origem,destino,custo,caminho
+REC,POA,2960.6,REC -> SSA -> CNF -> GRU -> POA
+MAO,GRU,2686.8,MAO -> GRU
+REC,VIX,1989.7,REC -> SSA -> CNF -> VIX
+BEL,POA,3221.1,BEL -> BSB -> CWB -> POA
+RBR,JPA,3980.3,RBR -> BSB -> JPA
+SSA,CWB,1795.7,SSA -> CNF -> CWB
+FOR,GIG,2327.2,FOR -> SSA -> CNF -> GIG

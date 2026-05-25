@@ -1,301 +1,152 @@
+import time
 import json
+import random
 from pathlib import Path
+import sys
+sys.setrecursionlimit(100000)
 
-import pandas as pd
+# Importando as estruturas da sua equipe
+from src.graphs.io import build_tmdb_graph
+from src.graphs.graph import Graph
+from src.graphs.algorithms import (
+    bfs_layers, 
+    dfs, 
+    dijkstra, 
+    bellman_ford
+)
 
-from src.graphs.io import build_airport_graph
-from src.graphs.algorithms import dijkstra
+def measure_time(func, *args, **kwargs):
+    """Executa uma função e retorna o tempo em milissegundos e o resultado."""
+    start = time.perf_counter()
+    result = func(*args, **kwargs)
+    end = time.perf_counter()
+    return (end - start) * 1000, result
 
-
-DATA_DIR = Path("data")
-OUT_DIR = Path("out")
-
-AIRPORTS_PATH = DATA_DIR / "aeroportos_data.csv"
-ADJACENCIES_PATH = DATA_DIR / "adjacencias_aeroportos.csv"
-ROUTES_PATH = DATA_DIR / "rotas.csv"
-
-
-def ensure_out_dir():
+def criar_cenarios_bellman_ford():
     """
-    Garante que a pasta out/ exista.
+    Gera dois subgrafos direcionados para provar o funcionamento do Bellman-Ford.
     """
+    # Cenário 1: Peso negativo SEM ciclo negativo
+    g_sem_ciclo = Graph(directed=True, allow_negative_weights=True)
+    g_sem_ciclo.add_edge("A_Keanu Reeves", "M_The Matrix", peso=-5.0)
+    g_sem_ciclo.add_edge("M_The Matrix", "A_Carrie-Anne Moss", peso=2.0)
+    
+    # Cenário 2: Com ciclo negativo detectável
+    g_com_ciclo = Graph(directed=True, allow_negative_weights=True)
+    g_com_ciclo.add_edge("A_Brad Pitt", "M_Fight Club", peso=1.0)
+    g_com_ciclo.add_edge("M_Fight Club", "A_Edward Norton", peso=1.0)
+    # Aresta de volta criando o ciclo negativo de soma -8
+    g_com_ciclo.add_edge("A_Edward Norton", "A_Brad Pitt", peso=-10.0) 
 
-    OUT_DIR.mkdir(exist_ok=True)
+    return g_sem_ciclo, g_com_ciclo
 
-
-def calculate_density(order: int, size: int, directed: bool = False) -> float:
-    """
-    Calcula a densidade de um grafo.
-
-    Para grafo não direcionado:
-    densidade = 2E / V(V - 1)
-
-    Para grafo direcionado:
-    densidade = E / V(V - 1)
-    """
-
-    if order < 2:
-        return 0.0
-
-    if directed:
-        return size / (order * (order - 1))
-
-    return (2 * size) / (order * (order - 1))
-
-
-def generate_global_metrics(graph):
-    """
-    Gera o arquivo out/global.json com:
-    - ordem;
-    - tamanho;
-    - densidade.
-    """
-
-    data = {
-        "ordem": graph.order(),
-        "tamanho": graph.size(),
-        "densidade": round(graph.density(), 4)
+def run_parte2(csv_path: str, max_edges: int = 100000):
+    report = {
+        "dataset_info": {},
+        "bfs_performance": [],
+        "dfs_performance": [],
+        "dijkstra_performance": [],
+        "bellman_ford_performance": {}
     }
 
-    output_path = OUT_DIR / "global.json"
+    # 1. Carregamento do Grafo Principal
+    print("\n[1/5] Construindo o Grafo Bipartido TMDB...")
+    t_build, graph = measure_time(build_tmdb_graph, csv_path, max_edges)
+    
+    atores = [n for n in graph.nodes() if n.startswith("A_")]
+    filmes = [n for n in graph.nodes() if n.startswith("M_")]
+    
+    report["dataset_info"] = {
+        "ordem": graph.order(),
+        "tamanho": graph.size(),
+        "tempo_construcao_ms": round(t_build, 2),
+        "total_atores": len(atores),
+        "total_filmes": len(filmes)
+    }
+    print(f"Grafo carregado! {graph.order()} nós e {graph.size()} arestas.")
 
-    with open(output_path, "w", encoding="utf-8") as file:
-        json.dump(data, file, ensure_ascii=False, indent=4)
+    # Escolher 3 fontes aleatórias garantidas de existir para BFS/DFS
+    fontes_busca = random.sample(atores, 3)
 
-    print(f"Arquivo gerado: {output_path}")
-
-
-def generate_region_metrics(graph):
-    """
-    Gera o arquivo out/regioes.json.
-
-    Para cada região, calcula:
-    - ordem: quantidade de aeroportos da região;
-    - tamanho: quantidade de arestas internas da região;
-    - densidade: densidade do subgrafo induzido pela região.
-    """
-
-    regions = {}
-
-    for node in graph.nodes():
-        attrs = graph.get_node_attrs(node)
-        region = attrs["regiao"]
-
-        if region not in regions:
-            regions[region] = []
-
-        regions[region].append(node)
-
-    result = []
-
-    for region, nodes in regions.items():
-        region_nodes = set(nodes)
-
-        internal_edges = [
-            (origem, destino)
-            for origem, destino, _ in graph.edges()
-            if origem in region_nodes and destino in region_nodes
-        ]
-
-        ordem = len(region_nodes)
-        tamanho = len(internal_edges)
-        densidade = calculate_density(ordem, tamanho, directed=False)
-
-        result.append({
-            "regiao": region,
-            "ordem": ordem,
-            "tamanho": tamanho,
-            "densidade": round(densidade, 4)
+    # 2. Executando BFS
+    print("\n[2/5] Executando BFS a partir de 3 fontes...")
+    for fonte in fontes_busca:
+        t_bfs, layers = measure_time(bfs_layers, graph, fonte)
+        report["bfs_performance"].append({
+            "fonte": fonte,
+            "tempo_ms": round(t_bfs, 2),
+            "nos_alcancados": len(layers),
+            "camada_maxima": max(layers.values()) if layers else 0
         })
 
-    result = sorted(result, key=lambda item: item["regiao"])
-
-    output_path = OUT_DIR / "regioes.json"
-
-    with open(output_path, "w", encoding="utf-8") as file:
-        json.dump(result, file, ensure_ascii=False, indent=4)
-
-    print(f"Arquivo gerado: {output_path}")
-
-
-def generate_degrees(graph):
-    """
-    Gera o arquivo out/graus.csv.
-
-    Colunas:
-    - aeroporto;
-    - grau.
-    """
-
-    rows = []
-
-    for node in graph.nodes():
-        rows.append({
-            "aeroporto": node,
-            "grau": graph.degree(node)
+    # 3. Executando DFS
+    print("\n[3/5] Executando DFS a partir das mesmas 3 fontes...")
+    for fonte in fontes_busca:
+        t_dfs, ordem = measure_time(dfs, graph, fonte)
+        report["dfs_performance"].append({
+            "fonte": fonte,
+            "tempo_ms": round(t_dfs, 2),
+            "nos_visitados": len(ordem)
         })
 
-    df = pd.DataFrame(rows)
-    df = df.sort_values(by=["grau", "aeroporto"], ascending=[False, True])
+    # 4. Executando Dijkstra (5 pares aleatórios)
+    print("\n[4/5] Executando Dijkstra para 5 pares Origem-Destino...")
+    pares_dijkstra = []
+    for _ in range(5):
+        origem = random.choice(atores)
+        destino = random.choice(atores)
+        pares_dijkstra.append((origem, destino))
 
-    output_path = OUT_DIR / "graus.csv"
-    df.to_csv(output_path, index=False, encoding="utf-8")
+    for origem, destino in pares_dijkstra:
+        try:
+            t_dijk, result = measure_time(dijkstra, graph, origem, destino)
+            custo = result["custo"]
+            caminho_len = len(result["caminho"])
+        except Exception as e:
+            t_dijk, custo, caminho_len = 0, str(e), 0
 
-    print(f"Arquivo gerado: {output_path}")
-
-
-def generate_ego_metrics(graph):
-    """
-    Gera o arquivo out/ego_aeroportos.csv.
-
-    Para cada aeroporto v, considera a ego-network:
-    v + todos os seus vizinhos.
-
-    Calcula:
-    - aeroporto;
-    - grau;
-    - ordem_ego;
-    - tamanho_ego;
-    - densidade_ego.
-    """
-
-    rows = []
-
-    all_edges = graph.edges()
-
-    for node in graph.nodes():
-        neighbors = set(graph.neighbors(node))
-        ego_nodes = {node} | neighbors
-
-        ego_edges = [
-            (origem, destino)
-            for origem, destino, _ in all_edges
-            if origem in ego_nodes and destino in ego_nodes
-        ]
-
-        ordem_ego = len(ego_nodes)
-        tamanho_ego = len(ego_edges)
-        densidade_ego = calculate_density(ordem_ego, tamanho_ego, directed=False)
-
-        rows.append({
-            "aeroporto": node,
-            "grau": graph.degree(node),
-            "ordem_ego": ordem_ego,
-            "tamanho_ego": tamanho_ego,
-            "densidade_ego": round(densidade_ego, 4)
-        })
-
-    df = pd.DataFrame(rows)
-    df = df.sort_values(by=["densidade_ego", "grau", "aeroporto"], ascending=[False, False, True])
-
-    output_path = OUT_DIR / "ego_aeroportos.csv"
-    df.to_csv(output_path, index=False, encoding="utf-8")
-
-    print(f"Arquivo gerado: {output_path}")
-
-
-def load_routes():
-    """
-    Carrega o arquivo data/rotas.csv.
-
-    Espera as colunas:
-    origem,destino
-    """
-
-    if not ROUTES_PATH.exists():
-        raise FileNotFoundError(
-            "Arquivo data/rotas.csv não encontrado. "
-            "Crie o arquivo antes de gerar as distâncias."
-        )
-
-    df = pd.read_csv(ROUTES_PATH)
-    df.columns = [col.strip().lower() for col in df.columns]
-
-    required_columns = {"origem", "destino"}
-    missing = required_columns - set(df.columns)
-
-    if missing:
-        raise ValueError(f"Colunas obrigatórias ausentes em rotas.csv: {missing}")
-
-    df["origem"] = df["origem"].astype(str).str.strip().str.upper()
-    df["destino"] = df["destino"].astype(str).str.strip().str.upper()
-
-    return df
-
-
-def generate_route_distances(graph):
-    """
-    Gera o arquivo out/distancias_rotas.csv.
-
-    Para cada par origem-destino em data/rotas.csv,
-    calcula o menor caminho usando Dijkstra.
-    """
-
-    df_routes = load_routes()
-
-    rows = []
-
-    for _, row in df_routes.iterrows():
-        origem = row["origem"]
-        destino = row["destino"]
-
-        result = dijkstra(graph, origem, destino)
-
-        caminho = " -> ".join(result["caminho"])
-
-        rows.append({
+        report["dijkstra_performance"].append({
             "origem": origem,
             "destino": destino,
-            "custo": round(result["custo"], 2),
-            "caminho": caminho
+            "tempo_ms": round(t_dijk, 2),
+            "custo": custo,
+            "tamanho_caminho": caminho_len
         })
 
-    df = pd.DataFrame(rows)
+    # 5. Executando Bellman-Ford
+    print("\n[5/5] Testando cenários do Bellman-Ford...")
+    g_sem_ciclo, g_com_ciclo = criar_cenarios_bellman_ford()
+    
+    # Teste A: Sem ciclo
+    t_bf_ok, bf_ok_result = measure_time(bellman_ford, g_sem_ciclo, "A_Keanu Reeves")
+    report["bellman_ford_performance"]["cenario_sem_ciclo"] = {
+        "tempo_ms": round(t_bf_ok, 2),
+        "status": "Sucesso",
+        "distancia_final": bf_ok_result["distancias"]["A_Carrie-Anne Moss"]
+    }
 
-    output_path = OUT_DIR / "distancias_rotas.csv"
-    df.to_csv(output_path, index=False, encoding="utf-8")
+    # Teste B: Com ciclo
+    try:
+        t_bf_erro, _ = measure_time(bellman_ford, g_com_ciclo, "A_Brad Pitt")
+        status = "Falha - O erro não foi disparado!"
+    except ValueError as e:
+        status = "Ciclo negativo detectado"
+        t_bf_erro = 0 # Ignorar tempo se deu erro
 
-    print(f"Arquivo gerado: {output_path}")
+    report["bellman_ford_performance"]["cenario_com_ciclo_negativo"] = {
+        "status": status
+    }
 
+    # Salvar Relatório
+    out_dir = Path("out")
+    out_dir.mkdir(exist_ok=True)
+    report_path = out_dir / "parte2_report.json"
+    
+    with open(report_path, "w", encoding="utf-8") as f:
+        json.dump(report, f, indent=4, ensure_ascii=False)
 
-def show_summary(graph):
-    """
-    Exibe um resumo no terminal.
-    """
-
-    print("\n=== RESUMO DO GRAFO ===")
-    print(f"Ordem: {graph.order()}")
-    print(f"Tamanho: {graph.size()}")
-    print(f"Densidade: {round(graph.density(), 4)}")
-
-    degrees = [(node, graph.degree(node)) for node in graph.nodes()]
-    most_connected = max(degrees, key=lambda item: item[1])
-
-    print(f"Aeroporto mais conectado: {most_connected[0]} | grau {most_connected[1]}")
-
-
-def main():
-    """
-    Função principal para gerar os arquivos obrigatórios.
-    """
-
-    ensure_out_dir()
-
-    graph = build_airport_graph(
-        str(AIRPORTS_PATH),
-        str(ADJACENCIES_PATH)
-    )
-
-    generate_global_metrics(graph)
-    generate_region_metrics(graph)
-    generate_degrees(graph)
-    generate_ego_metrics(graph)
-    generate_route_distances(graph)
-
-    show_summary(graph)
-
-    print("\nProcessamento concluído com sucesso.")
-
+    print(f"\nConcluído! Relatório gerado em: {report_path}")
 
 if __name__ == "__main__":
-    main()
+    CSV_TMDB = "data/tmdb_5000_credits.csv"
+    run_parte2(CSV_TMDB, max_edges=100000)

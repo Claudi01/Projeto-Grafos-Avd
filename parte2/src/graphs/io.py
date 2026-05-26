@@ -2,11 +2,11 @@ import pandas as pd
 import ast
 import json
 
-def build_tmdb_graph(path_tmdb: str, max_edges: int = 200000):
-    """
-    Cria o grafo bipartido (Filmes e Atores) a partir do dataset do TMDB.
-    """
+def build_tmdb_graph(path_tmdb: str, max_edges: int = 200000, top_cast: int = 5):
     from src.graphs.graph import Graph
+    import pandas as pd
+    import json
+    import ast
 
     print(f"Lendo dataset do TMDB em: {path_tmdb}...")
     df = pd.read_csv(path_tmdb)
@@ -17,22 +17,16 @@ def build_tmdb_graph(path_tmdb: str, max_edges: int = 200000):
     graph = Graph(directed=False)
     edges_added = 0
 
-    print("Construindo o grafo de atores e filmes (Isso pode levar alguns segundos)...")
-    
+    print(f"Construindo rede de atores (Top {top_cast} por filme)...")
+
     for index, row in df.iterrows():
         if edges_added >= max_edges:
             break
-            
-        movie_title = str(row['title']).strip()
-        if not movie_title or movie_title == "nan":
-            continue
-            
-        movie_node = f"M_{movie_title}"
-        graph.add_node(movie_node, tipo="filme", titulo=movie_title)
-        
+
         cast_str = str(row['cast'])
         if cast_str == "nan" or not cast_str.strip():
-            continue            
+            continue
+
         try:
             try:
                 cast_data = json.loads(cast_str.replace("'", '"'))
@@ -40,29 +34,43 @@ def build_tmdb_graph(path_tmdb: str, max_edges: int = 200000):
                 cast_data = ast.literal_eval(cast_str)
         except (ValueError, SyntaxError):
             continue
-            
+
         if not isinstance(cast_data, list):
             continue
-            
+
+        atores_filme = []
         for actor in cast_data:
             if isinstance(actor, dict) and 'name' in actor:
                 actor_name = str(actor['name']).strip()
-                if not actor_name:
+                if actor_name:
+                    ator_formatado = f"A_{actor_name}"
+                    if ator_formatado not in atores_filme:
+                        atores_filme.append(ator_formatado)
+            if len(atores_filme) == top_cast:
+                break
+
+        for ator in atores_filme:
+            graph.add_node(ator, tipo="ator", nome=ator[2:])
+
+        for i in range(len(atores_filme)):
+            for j in range(i + 1, len(atores_filme)):
+                ator_u = atores_filme[i]
+                ator_v = atores_filme[j]
+
+                if ator_u == ator_v:
                     continue
-                    
-                actor_node = f"A_{actor_name}"
-                graph.add_node(actor_node, tipo="ator", nome=actor_name)
-                
-                graph.add_edge(
-                    movie_node, 
-                    actor_node, 
-                    peso=1.0, 
-                    tipo_conexao="atuou_em"
-                )
-                edges_added += 1
-                
+
+                if graph.has_edge(ator_u, ator_v):
+                    peso_atual = graph.get_edge_attrs(ator_u, ator_v)["peso"]
+                    graph.add_edge(ator_u, ator_v, peso=peso_atual + 1.0, tipo_conexao="colaboracao")
+                else:
+                    graph.add_edge(ator_u, ator_v, peso=1.0, tipo_conexao="colaboracao")
+                    edges_added += 1
+
                 if edges_added >= max_edges:
                     break
+            if edges_added >= max_edges:
+                break
 
-    print(f"Grafo do TMDB construído! Total de arestas: {edges_added}")
+    print(f"Rede de atores construída! Total de arestas únicas: {edges_added}")
     return graph

@@ -1,83 +1,82 @@
 {
     "dataset_info": {
-        "ordem": 54857,
-        "tamanho": 99831,
-        "tempo_construcao_ms": 3508.87,
-        "total_atores": 50585,
-        "total_filmes": 4272
+        "ordem": 9394,
+        "tamanho": 45117,
+        "tempo_construcao_ms": 3866.91,
+        "total_atores": 9394
     },
     "bfs_performance": [
         {
-            "fonte": "A_José Fumanal",
-            "tempo_ms": 79.56,
-            "nos_alcancados": 54483,
-            "camada_maxima": 12
+            "fonte": "A_Al Pacino",
+            "tempo_ms": 25.7,
+            "nos_alcancados": 7887,
+            "camada_maxima": 7
         },
         {
-            "fonte": "A_Laura Birn",
-            "tempo_ms": 68.64,
-            "nos_alcancados": 54483,
-            "camada_maxima": 10
+            "fonte": "A_David Thewlis",
+            "tempo_ms": 19.7,
+            "nos_alcancados": 7887,
+            "camada_maxima": 7
         },
         {
-            "fonte": "A_Vong Lee",
-            "tempo_ms": 72.81,
-            "nos_alcancados": 54483,
-            "camada_maxima": 12
+            "fonte": "A_Robert Vaughn",
+            "tempo_ms": 18.5,
+            "nos_alcancados": 7887,
+            "camada_maxima": 8
         }
     ],
     "dfs_performance": [
         {
-            "fonte": "A_José Fumanal",
-            "tempo_ms": 78.38,
-            "nos_visitados": 54483
+            "fonte": "A_Al Pacino",
+            "tempo_ms": 28.68,
+            "nos_visitados": 7887
         },
         {
-            "fonte": "A_Laura Birn",
-            "tempo_ms": 134.22,
-            "nos_visitados": 54483
+            "fonte": "A_David Thewlis",
+            "tempo_ms": 25.55,
+            "nos_visitados": 7887
         },
         {
-            "fonte": "A_Vong Lee",
-            "tempo_ms": 72.01,
-            "nos_visitados": 54483
+            "fonte": "A_Robert Vaughn",
+            "tempo_ms": 25.83,
+            "nos_visitados": 7887
         }
     ],
     "dijkstra_performance": [
         {
-            "origem": "A_Stephen Elliott",
-            "destino": "A_Joanna 'JoJo' Levesque",
-            "tempo_ms": 281.01,
-            "custo": 8.0,
-            "tamanho_caminho": 9
+            "origem": "A_Morris Day",
+            "destino": "A_Tsai Chin",
+            "tempo_ms": 77.97,
+            "custo": 5.0,
+            "tamanho_caminho": 6
         },
         {
-            "origem": "A_Nathalie Lunghi",
-            "destino": "A_Mathieu Lardier",
-            "tempo_ms": 229.33,
-            "custo": 6.0,
-            "tamanho_caminho": 7
+            "origem": "A_Elizabeth Hunter",
+            "destino": "A_Rachel Blanchard",
+            "tempo_ms": 48.8,
+            "custo": 4.0,
+            "tamanho_caminho": 5
         },
         {
-            "origem": "A_Tim Dutton",
-            "destino": "A_Michael Roland",
-            "tempo_ms": 245.93,
-            "custo": 6.0,
-            "tamanho_caminho": 7
+            "origem": "A_Elijah Smith",
+            "destino": "A_Gabrielle Rose",
+            "tempo_ms": 41.55,
+            "custo": 4.0,
+            "tamanho_caminho": 5
         },
         {
-            "origem": "A_Susan Goforth",
-            "destino": "A_Zvee Scooler",
-            "tempo_ms": 326.86,
-            "custo": 8.0,
-            "tamanho_caminho": 9
+            "origem": "A_Wang Baoqiang",
+            "destino": "A_Daniel Zovatto",
+            "tempo_ms": 41.5,
+            "custo": 5.0,
+            "tamanho_caminho": 6
         },
         {
-            "origem": "A_Ramona Blair",
-            "destino": "A_Al Dubois",
-            "tempo_ms": 103.79,
-            "custo": 6.0,
-            "tamanho_caminho": 7
+            "origem": "A_Peter Scolari",
+            "destino": "A_Jessica Tandy",
+            "tempo_ms": 46.44,
+            "custo": 4.0,
+            "tamanho_caminho": 5
         }
     ],
     "bellman_ford_performance": {
@@ -87,7 +86,7 @@
             "distancia_final": -3.0
         },
         "cenario_com_ciclo_negativo": {
-            "status": "Ciclo negativo detectado"
+            "status": "Ciclo negativo detectado com sucesso"
         }
     }
 }

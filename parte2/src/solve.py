@@ -23,26 +23,25 @@ def measure_time(func, *args, **kwargs):
 
 def criar_cenarios_bellman_ford():
     g_sem_ciclo = Graph(directed=True, allow_negative_weights=True)
-    g_sem_ciclo.add_edge("A_Keanu Reeves", "A_Carrie-Anne Moss", peso=-5.0)
-    g_sem_ciclo.add_edge("A_Carrie-Anne Moss", "A_Laurence Fishburne", peso=2.0)
+    g_sem_ciclo.add_edge("Keanu Reeves", "Carrie-Anne Moss", peso=-5.0)
+    g_sem_ciclo.add_edge("Carrie-Anne Moss", "Laurence Fishburne", peso=2.0)
     
     g_com_ciclo = Graph(directed=True, allow_negative_weights=True)
-    g_com_ciclo.add_edge("A_Brad Pitt", "A_Edward Norton", peso=1.0)
-    g_com_ciclo.add_edge("A_Edward Norton", "A_Helena Bonham Carter", peso=1.0)
-    g_com_ciclo.add_edge("A_Helena Bonham Carter", "A_Brad Pitt", peso=-10.0) 
+    g_com_ciclo.add_edge("Brad Pitt", "Edward Norton", peso=1.0)
+    g_com_ciclo.add_edge("Edward Norton", "Helena Bonham Carter", peso=1.0)
+    g_com_ciclo.add_edge("Helena Bonham Carter", "Brad Pitt", peso=-10.0) 
 
     return g_sem_ciclo, g_com_ciclo
 
 def run_parte2(csv_path: str, max_edges: int = 100000):
     report = {
         "dataset_info": {},
-        "bfs_performance": [],
-        "dfs_performance": [],
-        "dijkstra_performance": [],
-        "bellman_ford_performance": {}
+        "bfs": [],
+        "dfs": [],
+        "dijkstra": [],
+        "bellman_ford": {}
     }
 
-    print("\n[1/5] Construindo a Rede de Atores TMDB...")
     t_build, graph = measure_time(build_tmdb_graph, csv_path, max_edges)
     
     atores = graph.nodes()
@@ -53,30 +52,26 @@ def run_parte2(csv_path: str, max_edges: int = 100000):
         "tempo_construcao_ms": round(t_build, 2),
         "total_atores": len(atores)
     }
-    print(f"Grafo carregado! {graph.order()} nós e {graph.size()} arestas.")
 
     fontes_busca = random.sample(atores, min(3, len(atores)))
 
-    print("\n[2/5] Executando BFS a partir de 3 fontes...")
     for fonte in fontes_busca:
         t_bfs, layers = measure_time(bfs_layers, graph, fonte)
-        report["bfs_performance"].append({
+        report["bfs"].append({
             "fonte": fonte,
             "tempo_ms": round(t_bfs, 2),
             "nos_alcancados": len(layers),
             "camada_maxima": max(layers.values()) if layers else 0
         })
 
-    print("\n[3/5] Executando DFS a partir das mesmas 3 fontes...")
     for fonte in fontes_busca:
         t_dfs, ordem = measure_time(dfs, graph, fonte)
-        report["dfs_performance"].append({
+        report["dfs"].append({
             "fonte": fonte,
             "tempo_ms": round(t_dfs, 2),
             "nos_visitados": len(ordem)
         })
 
-    print("\n[4/5] Executando Dijkstra para 5 pares Origem-Destino...")
     pares_dijkstra = []
     for _ in range(5):
         origem = random.choice(atores)
@@ -89,15 +84,13 @@ def run_parte2(csv_path: str, max_edges: int = 100000):
             custo = result["custo"]
             caminho_len = len(result["caminho"])
             
-            # --- ADIÇÃO PARA CORRIGIR O JSON ---
             if custo == float('inf'):
-                custo = "Infinito"
-            # -----------------------------------
-            
+                custo = "Infinito (Sem caminho)"
+                
         except Exception as e:
             t_dijk, custo, caminho_len = 0, str(e), 0
 
-        report["dijkstra_performance"].append({
+        report["dijkstra"].append({
             "origem": origem,
             "destino": destino,
             "tempo_ms": round(t_dijk, 2),
@@ -105,23 +98,22 @@ def run_parte2(csv_path: str, max_edges: int = 100000):
             "tamanho_caminho": caminho_len
         })
 
-    print("\n[5/5] Testando cenários do Bellman-Ford...")
     g_sem_ciclo, g_com_ciclo = criar_cenarios_bellman_ford()
     
-    t_bf_ok, bf_ok_result = measure_time(bellman_ford, g_sem_ciclo, "A_Keanu Reeves")
-    report["bellman_ford_performance"]["cenario_sem_ciclo"] = {
+    t_bf_ok, bf_ok_result = measure_time(bellman_ford, g_sem_ciclo, "Keanu Reeves")
+    report["bellman_ford"]["cenario_sem_ciclo"] = {
         "tempo_ms": round(t_bf_ok, 2),
         "status": "Sucesso",
-        "distancia_final": bf_ok_result["distancias"].get("A_Laurence Fishburne", 0)
+        "distancia_final": bf_ok_result["distancias"].get("Laurence Fishburne", 0)
     }
 
     try:
-        t_bf_erro, _ = measure_time(bellman_ford, g_com_ciclo, "A_Brad Pitt")
+        t_bf_erro, _ = measure_time(bellman_ford, g_com_ciclo, "Brad Pitt")
         status = "Falha - O erro não foi disparado!"
     except ValueError:
         status = "Ciclo negativo detectado com sucesso" 
 
-    report["bellman_ford_performance"]["cenario_com_ciclo_negativo"] = {
+    report["bellman_ford"]["cenario_com_ciclo_negativo"] = {
         "status": status
     }
 
@@ -132,7 +124,7 @@ def run_parte2(csv_path: str, max_edges: int = 100000):
     with open(report_path, "w", encoding="utf-8") as f:
         json.dump(report, f, indent=4, ensure_ascii=False)
 
-    print(f"\nConcluído! Relatório gerado em: {report_path}")
+    print(f"Processamento concluído! Relatório gerado em: {report_path}")
 
 if __name__ == "__main__":
     CSV_TMDB = "data/tmdb_5000_credits.csv"

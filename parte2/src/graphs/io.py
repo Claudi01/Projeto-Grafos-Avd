@@ -8,7 +8,6 @@ def build_tmdb_graph(path_tmdb: str, max_edges: int = 200000, top_cast: int = 5)
     import json
     import ast
 
-    print(f"Lendo dataset do TMDB em: {path_tmdb}...")
     df = pd.read_csv(path_tmdb)
 
     if 'title' not in df.columns or 'cast' not in df.columns:
@@ -16,8 +15,6 @@ def build_tmdb_graph(path_tmdb: str, max_edges: int = 200000, top_cast: int = 5)
 
     graph = Graph(directed=False)
     edges_added = 0
-
-    print(f"Construindo rede de atores (Top {top_cast} por filme)...")
 
     for index, row in df.iterrows():
         if edges_added >= max_edges:
@@ -43,14 +40,13 @@ def build_tmdb_graph(path_tmdb: str, max_edges: int = 200000, top_cast: int = 5)
             if isinstance(actor, dict) and 'name' in actor:
                 actor_name = str(actor['name']).strip()
                 if actor_name:
-                    ator_formatado = f"A_{actor_name}"
-                    if ator_formatado not in atores_filme:
-                        atores_filme.append(ator_formatado)
+                    if actor_name not in atores_filme:
+                        atores_filme.append(actor_name)
             if len(atores_filme) == top_cast:
                 break
 
         for ator in atores_filme:
-            graph.add_node(ator, tipo="ator", nome=ator[2:])
+            graph.add_node(ator, tipo="ator", nome=ator)
 
         for i in range(len(atores_filme)):
             for j in range(i + 1, len(atores_filme)):
@@ -72,5 +68,4 @@ def build_tmdb_graph(path_tmdb: str, max_edges: int = 200000, top_cast: int = 5)
             if edges_added >= max_edges:
                 break
 
-    print(f"Rede de atores construída! Total de arestas únicas: {edges_added}")
     return graph

@@ -2,86 +2,86 @@
     "dataset_info": {
         "ordem": 9394,
         "tamanho": 45117,
-        "tempo_construcao_ms": 4461.94,
+        "tempo_construcao_ms": 4888.5,
         "total_atores": 9394
     },
     "bfs": [
         {
-            "fonte": "Bonnie Hunt",
-            "tempo_ms": 16.7,
+            "fonte": "Adrian Gonzalez",
+            "tempo_ms": 0.02,
+            "nos_alcancados": 3,
+            "camada_maxima": 1
+        },
+        {
+            "fonte": "Elijah Wood",
+            "tempo_ms": 17.52,
             "nos_alcancados": 7887,
             "camada_maxima": 7
         },
         {
-            "fonte": "Lalaine",
-            "tempo_ms": 13.83,
-            "nos_alcancados": 7887,
-            "camada_maxima": 9
-        },
-        {
-            "fonte": "Angus Macfadyen",
-            "tempo_ms": 14.03,
+            "fonte": "Jo Hartley",
+            "tempo_ms": 31.85,
             "nos_alcancados": 7887,
             "camada_maxima": 8
         }
     ],
     "dfs": [
         {
-            "fonte": "Bonnie Hunt",
-            "tempo_ms": 15.43,
+            "fonte": "Adrian Gonzalez",
+            "tempo_ms": 0.01,
+            "nos_visitados": 3
+        },
+        {
+            "fonte": "Elijah Wood",
+            "tempo_ms": 19.0,
             "nos_visitados": 7887
         },
         {
-            "fonte": "Lalaine",
-            "tempo_ms": 15.18,
-            "nos_visitados": 7887
-        },
-        {
-            "fonte": "Angus Macfadyen",
-            "tempo_ms": 15.45,
+            "fonte": "Jo Hartley",
+            "tempo_ms": 20.39,
             "nos_visitados": 7887
         }
     ],
     "dijkstra": [
         {
-            "origem": "Peter Cullen",
-            "destino": "Richard Briers",
-            "tempo_ms": 44.6,
-            "custo": 5.0,
-            "tamanho_caminho": 6
+            "origem": "James Marsden",
+            "destino": "Cecilia Cheung",
+            "tempo_ms": 70.83,
+            "custo": 4.0,
+            "tamanho_caminho": 5
         },
         {
-            "origem": "Victoria Davis",
-            "destino": "Karena Ng",
-            "tempo_ms": 45.95,
+            "origem": "Mike O'Connell",
+            "destino": "Daniel Anderson",
+            "tempo_ms": 53.71,
             "custo": 6.0,
             "tamanho_caminho": 7
         },
         {
-            "origem": "Maggie Elizabeth Jones",
-            "destino": "Chris Chatman",
-            "tempo_ms": 50.87,
-            "custo": "Infinito (Sem caminho)",
-            "tamanho_caminho": 0
+            "origem": "Charlotte Prior",
+            "destino": "Perry Laylon Ojeda",
+            "tempo_ms": 81.46,
+            "custo": 6.0,
+            "tamanho_caminho": 7
         },
         {
-            "origem": "Andy García",
-            "destino": "Rob LaBelle",
-            "tempo_ms": 45.99,
-            "custo": 3.0,
-            "tamanho_caminho": 4
-        },
-        {
-            "origem": "Eric Bana",
-            "destino": "Lena",
-            "tempo_ms": 55.18,
+            "origem": "Cameron Goodman",
+            "destino": "Bruno Kirby",
+            "tempo_ms": 57.63,
             "custo": 5.0,
             "tamanho_caminho": 6
+        },
+        {
+            "origem": "Marshall Chapman",
+            "destino": "François Truffaut",
+            "tempo_ms": 33.22,
+            "custo": 4.0,
+            "tamanho_caminho": 5
         }
     ],
     "bellman_ford": {
         "cenario_sem_ciclo": {
-            "tempo_ms": 0.06,
+            "tempo_ms": 0.02,
             "status": "Sucesso",
             "distancia_final": -3.0
         },

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Grafo Interativo — Projeto de Grafos</title>
+
+    <link rel="stylesheet" href="/css/style.css" />
+
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+</head>
+
+<body>
+    <header class="app-header compact-header">
+        <div class="header-content">
+            <span class="eyebrow">Exploração Interativa</span>
+            <h1>Grafo Interativo no Mapa do Brasil</h1>
+            <p>
+                Visualização geográfica dos aeroportos e conexões, preservando o posicionamento
+                dos estados brasileiros e permitindo explorar rotas, hubs e conexões diretas.
+            </p>
+        </div>
+    </header>
+
+    <nav class="navbar">
+        <a href="/">Visão Geral</a>
+        <a href="/grafo" class="active">Grafo Interativo</a>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/insights">Insights</a>
+    </nav>
+
+    <main>
+        <section class="section graph-section">
+            <div class="section-heading">
+                <div>
+                    <span class="section-kicker">Mapa geográfico</span>
+                    <h2>Rede de Aeroportos</h2>
+                </div>
+            </div>
+
+            <div class="graph-dashboard">
+                <div class="map-panel">
+                    <div class="map-header">
+                        <div>
+                            <strong>Mapa da rede aérea</strong>
+                            <span>Aeroportos fixos, conexões fixas e rotas dinâmicas</span>
+                        </div>
+
+                        <div class="map-status">
+                            <span class="status-dot"></span>
+                            <span id="map-dynamic-status">Mapa interativo</span>
+                        </div>
+                    </div>
+
+                    <div class="map-help">
+                        <span>Clique em um aeroporto para destacar suas conexões.</span>
+                        <span>Use os filtros para focar regiões sem alterar as posições geográficas.</span>
+                    </div>
+
+                    <div id="map"></div>
+                </div>
+
+                <aside class="graph-control-panel">
+                    <div class="control-card">
+                        <div class="control-title">
+                            <span>01</span>
+                            <h3>Aeroporto selecionado</h3>
+                        </div>
+
+                        <div id="node-details" class="details-box empty-state">
+                            Nenhum aeroporto selecionado.
+                            <br />
+                            Clique em um ponto no mapa para visualizar cidade, região, grau e conexões diretas.
+                        </div>
+                    </div>
+
+                    <div class="control-card">
+                        <div class="control-title">
+                            <span>02</span>
+                            <h3>Menor caminho</h3>
+                        </div>
+
+                        <label for="route-origin">Origem</label>
+                        <select id="route-origin"></select>
+
+                        <label for="route-destination">Destino</label>
+                        <select id="route-destination"></select>
+
+                        <button id="btn-calculate-route" class="primary-button" type="button">
+                            Calcular rota
+                        </button>
+
+                        <div class="quick-actions">
+                            <button id="btn-rec-poa" type="button">REC → POA</button>
+                            <button id="btn-mao-gru" type="button">MAO → GRU</button>
+                        </div>
+
+                        <button id="btn-clear-highlight" class="danger-button" type="button">
+                            Limpar destaques
+                        </button>
+
+                        <div id="route-result" class="details-box route-box"></div>
+                    </div>
+
+                    <div class="control-card">
+                        <div class="control-title">
+                            <span>03</span>
+                            <h3>Controles do mapa</h3>
+                        </div>
+
+                        <label for="region-filter">Filtrar região</label>
+                        <select id="region-filter">
+                            <option value="TODAS">Todas as regiões</option>
+                            <option value="Norte">Norte</option>
+                            <option value="Nordeste">Nordeste</option>
+                            <option value="Centro-Oeste">Centro-Oeste</option>
+                            <option value="Sudeste">Sudeste</option>
+                            <option value="Sul">Sul</option>
+                        </select>
+
+                        <button id="btn-toggle-edges" class="secondary-button" type="button">
+                            Ocultar conexões fixas
+                        </button>
+
+                        <div class="focus-grid">
+                            <button id="btn-focus-brasil" type="button">Brasil</button>
+                            <button id="btn-focus-norte" type="button">Norte</button>
+                            <button id="btn-focus-nordeste" type="button">Nordeste</button>
+                            <button id="btn-focus-centro" type="button">Centro-Oeste</button>
+                            <button id="btn-focus-sudeste" type="button">Sudeste</button>
+                            <button id="btn-focus-sul" type="button">Sul</button>
+                        </div>
+                    </div>
+
+                    <div class="control-card">
+                        <div class="control-title">
+                            <span>04</span>
+                            <h3>Legenda regional</h3>
+                        </div>
+
+                        <div class="legend-grid">
+                            <span><i class="dot norte"></i>Norte</span>
+                            <span><i class="dot nordeste"></i>Nordeste</span>
+                            <span><i class="dot centro"></i>Centro-Oeste</span>
+                            <span><i class="dot sudeste"></i>Sudeste</span>
+                            <span><i class="dot sul"></i>Sul</span>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        Grafo Interativo | Posicionamento geográfico preservado
+    </footer>
+
+    <script src="/js/api.js"></script>
+    <script src="/js/map.js"></script>
+    <script src="/js/grafo-page.js"></script>
+</body>
+</html>

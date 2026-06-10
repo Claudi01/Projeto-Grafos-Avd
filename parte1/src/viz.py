@@ -13,6 +13,7 @@ OUT_DIR = Path("out")
 
 AIRPORTS_PATH = DATA_DIR / "aeroportos_data.csv"
 ADJACENCIES_PATH = DATA_DIR / "adjacencias_aeroportos.csv"
+PASSENGERS_PATH = DATA_DIR / "passageiros.csv"
 
 GRAUS_PATH = OUT_DIR / "graus.csv"
 REGIOES_PATH = OUT_DIR / "regioes.json"
@@ -48,209 +49,283 @@ def save_figure(path_out: Path) -> None:
     print(f"Arquivo gerado: {path_out}")
 
 
-def plot_degree_histogram(path_in: Path, path_out: Path) -> None:
-    """
-    Visualização exploratória:
-    Gera um histograma da distribuição de graus dos aeroportos.
-    """
+def read_csv_data(
+    path: Path,
+    required_columns: set[str],
+    description: str
+) -> pd.DataFrame:
+    """Carrega um CSV e valida as colunas obrigatórias."""
+    check_file_exists(path)
+    df = pd.read_csv(path)
+    missing = required_columns - set(df.columns)
 
-    check_file_exists(path_in)
+    if missing:
+        raise ValueError(f"O arquivo {description} não possui as colunas: {missing}")
 
-    df = pd.read_csv(path_in)
+    return df
 
-    if "grau" not in df.columns:
-        raise ValueError("O arquivo de graus não possui a coluna 'grau'.")
 
-    fig, ax = plt.subplots(figsize=(9, 6))
+def read_passenger_data(path: Path) -> pd.DataFrame:
+    """Carrega e normaliza os dados de passageiros por aeroporto."""
+    df = read_csv_data(
+        path,
+        {"iata", "passageiros_milhoes"},
+        "de passageiros"
+    )
+    df["iata"] = df["iata"].astype(str).str.strip().str.upper()
+    df["passageiros_milhoes"] = (
+        df["passageiros_milhoes"]
+        .astype(str)
+        .str.replace(",", ".", regex=False)
+        .astype(float)
+    )
+    return df
 
-    ax.hist(
-        df["grau"],
-        bins=10,
-        color="skyblue",
-        edgecolor="black",
-        label="Frequência dos graus"
+
+def merge_degrees_and_passengers(
+    degrees_path: Path,
+    passengers_path: Path
+) -> pd.DataFrame:
+    """Combina passageiros e graus, mantendo aeroportos presentes no grafo."""
+    graus_df = read_csv_data(
+        degrees_path,
+        {"aeroporto", "grau"},
+        "de graus"
+    )
+    passageiros_df = read_passenger_data(passengers_path)
+
+    graus_df["aeroporto"] = (
+        graus_df["aeroporto"].astype(str).str.strip().str.upper()
+    )
+    graus_df["grau"] = pd.to_numeric(graus_df["grau"], errors="raise")
+
+    return passageiros_df.merge(
+        graus_df[["aeroporto", "grau"]],
+        left_on="iata",
+        right_on="aeroporto",
+        how="inner"
     )
 
-    ax.set_title(
-        "Distribuição de Graus dos Aeroportos",
-        fontsize=14,
-        fontweight="bold",
-        pad=15
-    )
-    ax.set_xlabel("Grau — número de conexões diretas", fontsize=12)
-    ax.set_ylabel("Quantidade de aeroportos", fontsize=12)
-    ax.grid(axis="y", linestyle="--", alpha=0.7)
-    ax.legend()
 
-    save_figure(path_out)
+def style_axes(
+    ax,
+    title: str,
+    xlabel: str,
+    ylabel: str,
+    grid_axis: str = "y"
+) -> None:
+    """Aplica o padrão visual compartilhado pelos gráficos do dashboard."""
+    ax.set_title(title, fontsize=14, fontweight="bold", pad=15)
+    ax.set_xlabel(xlabel, fontsize=12)
+    ax.set_ylabel(ylabel, fontsize=12)
+    ax.grid(axis=grid_axis, linestyle="--", alpha=0.7)
+    ax.set_axisbelow(True)
+
+
+def add_bar_labels(ax, bars, formatter) -> None:
+    """Adiciona os valores acima das barras sem encostar no limite do eixo."""
+    heights = [float(bar.get_height()) for bar in bars]
+    offset = max(heights, default=0) * 0.015 or 0.05
+
+    for bar, height in zip(bars, heights):
+        ax.text(
+            bar.get_x() + bar.get_width() / 2,
+            height + offset,
+            formatter(height),
+            ha="center",
+            va="bottom",
+            fontsize=9
+        )
+
+    ax.margins(y=0.12)
 
 
 def plot_top_airports(path_in: Path, path_out: Path, top_n: int = 10) -> None:
     """
-    Visualização explanatória:
-    Gera um gráfico de barras com o ranking dos aeroportos mais conectados.
+    Gera um gráfico de barras ordenado com os aeroportos de maior grau.
     """
-
-    check_file_exists(path_in)
-
-    df = pd.read_csv(path_in)
-
-    required_columns = {"aeroporto", "grau"}
-    missing = required_columns - set(df.columns)
-
-    if missing:
-        raise ValueError(f"O arquivo de graus não possui as colunas: {missing}")
-
-    df_sorted = df.sort_values(by="grau", ascending=False).head(top_n)
+    df = read_csv_data(path_in, {"aeroporto", "grau"}, "de graus")
+    df["grau"] = pd.to_numeric(df["grau"], errors="raise")
+    df_sorted = df.sort_values(
+        by=["grau", "aeroporto"],
+        ascending=[False, True]
+    ).head(top_n)
 
     fig, ax = plt.subplots(figsize=(10, 6))
 
     bars = ax.bar(
         df_sorted["aeroporto"],
         df_sorted["grau"],
-        color="coral",
+        color="#3b82f6",
         edgecolor="black",
         label="Grau dos aeroportos"
     )
 
-    ax.set_title(
-        f"Top {top_n} Aeroportos Mais Conectados",
-        fontsize=14,
-        fontweight="bold",
-        pad=15
+    style_axes(
+        ax,
+        f"Ranking de Graus dos Aeroportos — Top {top_n}",
+        "Aeroportos — código IATA",
+        "Grau — número de conexões diretas"
     )
-    ax.set_xlabel("Aeroportos — código IATA", fontsize=12)
-    ax.set_ylabel("Grau — número de conexões diretas", fontsize=12)
-    ax.grid(axis="y", linestyle="--", alpha=0.7)
     ax.legend()
-
-    for bar in bars:
-        height = bar.get_height()
-        ax.text(
-            bar.get_x() + bar.get_width() / 2,
-            height + 0.2,
-            str(int(height)),
-            ha="center",
-            va="bottom",
-            fontsize=9
-        )
+    add_bar_labels(ax, bars, lambda value: str(int(value)))
 
     save_figure(path_out)
 
 
-def plot_region_density(path_in: Path, path_out: Path) -> None:
-    """
-    Visualização exploratória/explanatória:
-    Gera um gráfico de barras comparando a densidade interna das regiões.
-    """
+def plot_passenger_ranking(
+    path_in: Path,
+    path_out: Path,
+    top_n: int = 10
+) -> None:
+    """Gera o ranking dos aeroportos com maior volume de passageiros."""
+    df = read_passenger_data(path_in)
+    df_sorted = df.sort_values(
+        by=["passageiros_milhoes", "iata"],
+        ascending=[False, True]
+    ).head(top_n)
 
-    check_file_exists(path_in)
-
-    with open(path_in, "r", encoding="utf-8") as file:
-        data = json.load(file)
-
-    df = pd.DataFrame(data)
-
-    required_columns = {"regiao", "densidade"}
-    missing = required_columns - set(df.columns)
-
-    if missing:
-        raise ValueError(f"O arquivo regioes.json não possui as chaves: {missing}")
-
-    df = df.sort_values(by="densidade", ascending=False)
-
-    fig, ax = plt.subplots(figsize=(9, 6))
-
+    fig, ax = plt.subplots(figsize=(10, 6))
     bars = ax.bar(
-        df["regiao"],
-        df["densidade"],
-        color="mediumseagreen",
+        df_sorted["iata"],
+        df_sorted["passageiros_milhoes"],
+        color="#f97316",
         edgecolor="black",
-        label="Densidade regional"
+        label="Passageiros"
     )
 
-    ax.set_title(
-        "Densidade dos Subgrafos por Região",
-        fontsize=14,
-        fontweight="bold",
-        pad=15
+    style_axes(
+        ax,
+        f"Ranking de Passageiros por Aeroporto — Top {top_n}",
+        "Aeroportos — código IATA",
+        "Passageiros anuais — milhões"
     )
-    ax.set_xlabel("Região", fontsize=12)
-    ax.set_ylabel("Densidade interna do subgrafo", fontsize=12)
-    ax.set_ylim(0, 1)
-    ax.grid(axis="y", linestyle="--", alpha=0.7)
     ax.legend()
-
-    for bar in bars:
-        height = bar.get_height()
-        ax.text(
-            bar.get_x() + bar.get_width() / 2,
-            height + 0.02,
-            f"{height:.2f}",
-            ha="center",
-            va="bottom",
-            fontsize=9
-        )
-
+    add_bar_labels(ax, bars, lambda value: f"{value:.1f}")
     save_figure(path_out)
 
 
-def plot_ego_density_histogram(path_in: Path, path_out: Path) -> None:
-    """
-    Visualização exploratória:
-    Gera um histograma da distribuição da densidade das ego-networks.
-    """
+def plot_passengers_by_region(
+    passengers_path: Path,
+    regions_path: Path,
+    airports_path: Path,
+    degrees_path: Path,
+    path_out: Path
+) -> None:
+    """Soma os passageiros por região considerando aeroportos presentes no grafo."""
+    check_file_exists(regions_path)
 
-    check_file_exists(path_in)
+    with open(regions_path, "r", encoding="utf-8") as file:
+        regions_data = json.load(file)
 
-    df = pd.read_csv(path_in)
+    regions_df = pd.DataFrame(regions_data)
+    if "regiao" not in regions_df.columns:
+        raise ValueError("O arquivo regioes.json não possui a chave 'regiao'.")
 
-    if "densidade_ego" not in df.columns:
-        raise ValueError("O arquivo deve conter a coluna 'densidade_ego'.")
+    airports_df = read_csv_data(
+        airports_path,
+        {"iata", "regiao"},
+        "de aeroportos"
+    )
+    airports_df["iata"] = airports_df["iata"].astype(str).str.strip().str.upper()
 
-    fig, ax = plt.subplots(figsize=(9, 6))
+    comparison_df = merge_degrees_and_passengers(degrees_path, passengers_path)
+    comparison_df = comparison_df.merge(
+        airports_df[["iata", "regiao"]],
+        on="iata",
+        how="left"
+    )
 
-    ax.hist(
-        df["densidade_ego"],
-        bins=10,
-        color="orchid",
+    passengers_by_region = (
+        comparison_df
+        .groupby("regiao")["passageiros_milhoes"]
+        .sum()
+        .reindex(regions_df["regiao"].tolist(), fill_value=0)
+        .sort_values(ascending=False)
+    )
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+    bars = ax.bar(
+        passengers_by_region.index,
+        passengers_by_region.values,
+        color="#22c55e",
         edgecolor="black",
-        label="Frequência da densidade ego"
+        label="Passageiros por região"
     )
 
-    ax.set_title(
-        "Distribuição da Densidade das Ego-Networks",
-        fontsize=14,
-        fontweight="bold",
-        pad=15
+    style_axes(
+        ax,
+        "Passageiros por Região",
+        "Região",
+        "Passageiros anuais — milhões"
     )
-    ax.set_xlabel("Densidade ego", fontsize=12)
-    ax.set_ylabel("Quantidade de aeroportos", fontsize=12)
-    ax.grid(axis="y", linestyle="--", alpha=0.7)
     ax.legend()
+    add_bar_labels(ax, bars, lambda value: f"{value:.1f}")
+    save_figure(path_out)
 
+
+def plot_degree_vs_passengers(
+    degrees_path: Path,
+    passengers_path: Path,
+    path_out: Path
+) -> None:
+    """Gera o scatter plot da relação entre grau e volume de passageiros."""
+    df = merge_degrees_and_passengers(degrees_path, passengers_path)
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+    ax.scatter(
+        df["grau"],
+        df["passageiros_milhoes"],
+        s=80,
+        color="#22c55e",
+        edgecolor="black",
+        alpha=0.85,
+        label="Aeroportos"
+    )
+
+    for _, group in df.groupby("grau"):
+        ordered_group = group.sort_values(by="passageiros_milhoes")
+        center = (len(ordered_group) - 1) / 2
+
+        for position, row in enumerate(ordered_group.itertuples(index=False)):
+            vertical_offset = (position - center) * 12
+            ax.annotate(
+                row.iata,
+                (row.grau, row.passageiros_milhoes),
+                xytext=(6, vertical_offset),
+                textcoords="offset points",
+                fontsize=8,
+                va="center"
+            )
+
+    style_axes(
+        ax,
+        "Relação entre Grau e Passageiros",
+        "Grau — número de conexões diretas",
+        "Passageiros anuais — milhões",
+        grid_axis="both"
+    )
+    ax.legend()
     save_figure(path_out)
 
 
 def plot_top_ego_density(path_in: Path, path_out: Path, top_n: int = 10) -> None:
     """
-    Visualização explanatória:
-    Mostra os aeroportos com maior densidade ego.
+    Gera um gráfico de barras ordenado com as maiores densidades ego.
     """
-
-    check_file_exists(path_in)
-
-    df = pd.read_csv(path_in)
-
-    required_columns = {"aeroporto", "densidade_ego"}
-    missing = required_columns - set(df.columns)
-
-    if missing:
-        raise ValueError(f"O arquivo de ego-network não possui as colunas: {missing}")
-
+    df = read_csv_data(
+        path_in,
+        {"aeroporto", "grau", "densidade_ego"},
+        "de ego-network"
+    )
+    df["grau"] = pd.to_numeric(df["grau"], errors="raise")
+    df["densidade_ego"] = pd.to_numeric(
+        df["densidade_ego"],
+        errors="raise"
+    )
     df_sorted = df.sort_values(
-        by="densidade_ego",
-        ascending=False
+        by=["densidade_ego", "grau", "aeroporto"],
+        ascending=[False, False, True]
     ).head(top_n)
 
     fig, ax = plt.subplots(figsize=(10, 6))
@@ -258,33 +333,58 @@ def plot_top_ego_density(path_in: Path, path_out: Path, top_n: int = 10) -> None
     bars = ax.bar(
         df_sorted["aeroporto"],
         df_sorted["densidade_ego"],
-        color="slateblue",
+        color="#a855f7",
         edgecolor="black",
         label="Densidade ego"
     )
 
-    ax.set_title(
+    style_axes(
+        ax,
         f"Top {top_n} Aeroportos por Densidade Ego",
-        fontsize=14,
-        fontweight="bold",
-        pad=15
+        "Aeroportos — código IATA",
+        "Densidade ego"
     )
-    ax.set_xlabel("Aeroportos — código IATA", fontsize=12)
-    ax.set_ylabel("Densidade ego", fontsize=12)
-    ax.set_ylim(0, 1)
-    ax.grid(axis="y", linestyle="--", alpha=0.7)
+    ax.set_ylim(0, 1.12)
     ax.legend()
+    add_bar_labels(ax, bars, lambda value: f"{value:.2f}")
 
-    for bar in bars:
-        height = bar.get_height()
-        ax.text(
-            bar.get_x() + bar.get_width() / 2,
-            height + 0.02,
-            f"{height:.2f}",
-            ha="center",
-            va="bottom",
-            fontsize=9
-        )
+    save_figure(path_out)
+
+
+def plot_passengers_per_connection(
+    degrees_path: Path,
+    passengers_path: Path,
+    path_out: Path,
+    top_n: int = 10
+) -> None:
+    """Gera o ranking de passageiros por conexão direta do aeroporto."""
+    df = merge_degrees_and_passengers(degrees_path, passengers_path)
+    df = df[df["grau"] > 0].copy()
+    df["passageiros_por_conexao"] = (
+        df["passageiros_milhoes"] / df["grau"]
+    )
+    df_sorted = df.sort_values(
+        by=["passageiros_por_conexao", "iata"],
+        ascending=[False, True]
+    ).head(top_n)
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+    bars = ax.bar(
+        df_sorted["iata"],
+        df_sorted["passageiros_por_conexao"],
+        color="#06b6d4",
+        edgecolor="black",
+        label="Passageiros por conexão direta"
+    )
+
+    style_axes(
+        ax,
+        f"Passageiros por Conexão Direta — Top {top_n}",
+        "Aeroportos — código IATA",
+        "Milhões de passageiros por conexão"
+    )
+    ax.legend()
+    add_bar_labels(ax, bars, lambda value: f"{value:.2f}")
 
     save_figure(path_out)
 
@@ -560,67 +660,50 @@ def plot_route_tree(path_out: Path) -> None:
 
 def generate_visualization_notes(path_out: Path) -> None:
     """
-    Gera um arquivo Markdown com notas analíticas curtas
-    para serem aproveitadas no PDF técnico.
+    Gera um arquivo Markdown com as visualizações atuais do dashboard.
     """
 
     content = """# Notas Analíticas das Visualizações
 
-## 1. Histograma da Distribuição de Graus
-
-**Arquivo:** `out/histograma_graus.png`
-
-**Tipo:** visualização exploratória.
-
-Esta visualização mostra como os graus dos aeroportos estão distribuídos no grafo. O grau representa a quantidade de conexões diretas de cada aeroporto. O histograma permite observar se a rede possui muitos aeroportos com baixa conectividade ou se há concentração em aeroportos com alto número de conexões. Esse tipo de gráfico foi escolhido porque é adequado para representar a distribuição de uma variável numérica.
-
-## 2. Ranking dos Aeroportos Mais Conectados
+## 1. Ranking de Graus dos Aeroportos
 
 **Arquivo:** `out/ranking_graus.png`
 
-**Tipo:** visualização explanatória.
+Compara os aeroportos com maior número de conexões diretas e evidencia os hubs
+estruturais da rede.
 
-Esta visualização apresenta os aeroportos com maior grau no grafo. O gráfico de barras facilita a identificação dos principais hubs estruturais da rede. A mensagem principal é destacar quais aeroportos concentram mais conexões diretas e, portanto, exercem maior papel de integração no modelo construído.
+## 2. Ranking de Passageiros por Aeroporto
 
-## 3. Densidade dos Subgrafos por Região
+**Arquivo:** `out/ranking_passageiros.png`
 
-**Arquivo:** `out/densidade_regioes.png`
+Apresenta os aeroportos com maior movimentação anual de passageiros, em milhões.
 
-**Tipo:** visualização exploratória e comparativa.
+## 3. Passageiros por Região
 
-Esta visualização compara a densidade interna dos subgrafos regionais. A densidade indica o quanto os aeroportos de uma mesma região estão conectados entre si em relação ao máximo possível de conexões. O gráfico de barras foi escolhido porque permite comparar categorias regionais de forma direta e legível.
+**Arquivo:** `out/passageiros_por_regiao.png`
 
-## 4. Histograma da Densidade das Ego-Networks
+Soma o tráfego dos aeroportos presentes no grafo e permite comparar a concentração
+de passageiros entre as regiões listadas em `regioes.json`.
 
-**Arquivo:** `out/histograma_ego_densidade.png`
+## 4. Relação Grau x Passageiros
 
-**Tipo:** visualização exploratória.
+**Arquivo:** `out/grau_x_passageiros.png`
 
-Esta visualização mostra a distribuição das densidades ego dos aeroportos. A densidade ego mede o nível de conectividade local formado por um aeroporto e seus vizinhos diretos. O histograma permite analisar se a rede possui muitos aeroportos inseridos em vizinhanças locais densas ou se predominam ego-redes menos conectadas.
+Compara conectividade estrutural e movimentação operacional para verificar se
+aeroportos com maior grau também tendem a receber mais passageiros.
 
 ## 5. Top Aeroportos por Densidade Ego
 
 **Arquivo:** `out/top_ego_densidade.png`
 
-**Tipo:** visualização explanatória.
+Destaca aeroportos inseridos em vizinhanças locais mais interconectadas.
 
-Esta visualização destaca os aeroportos com maior densidade ego. Diferentemente do grau, que mede apenas o número de conexões diretas, a densidade ego mostra se os vizinhos de um aeroporto também estão conectados entre si. Assim, essa visualização ajuda a identificar aeroportos localizados em subestruturas locais mais coesas.
+## 6. Passageiros por Conexão Direta
 
-## 6. Camadas BFS a partir de Recife
+**Arquivo:** `out/passageiros_por_conexao.png`
 
-**Arquivo:** `out/camadas_bfs_rec.png`
-
-**Tipo:** visualização explanatória.
-
-Esta visualização mostra a distância estrutural dos aeroportos em relação a Recife, considerando o número de arestas necessárias para alcançar cada nó. A BFS percorre o grafo em camadas, tornando essa visualização adequada para representar níveis de alcance dentro da rede.
-
-## 7. Árvore de Percurso das Rotas Obrigatórias
-
-**Arquivo:** `out/arvore_percurso.png`
-
-**Tipo:** visualização obrigatória de percurso.
-
-Esta visualização apresenta os caminhos mínimos calculados pelo algoritmo de Dijkstra para as rotas Recife → Porto Alegre e Manaus → São Paulo. O objetivo é evidenciar a sequência de aeroportos percorrida e o custo total acumulado, considerando os pesos definidos no arquivo de adjacências.
+Relaciona o volume de passageiros ao grau de cada aeroporto e evidencia operações
+com tráfego elevado em relação ao número de conexões modeladas.
 """
 
     path_out.parent.mkdir(exist_ok=True)
@@ -633,15 +716,10 @@ Esta visualização apresenta os caminhos mínimos calculados pelo algoritmo de 
 
 def main() -> None:
     """
-    Executa todas as visualizações do projeto.
+    Gera as seis visualizações atuais do dashboard da aplicação.
     """
 
     ensure_out_dir()
-
-    plot_degree_histogram(
-        GRAUS_PATH,
-        OUT_DIR / "histograma_graus.png"
-    )
 
     plot_top_airports(
         GRAUS_PATH,
@@ -649,14 +727,24 @@ def main() -> None:
         top_n=10
     )
 
-    plot_region_density(
-        REGIOES_PATH,
-        OUT_DIR / "densidade_regioes.png"
+    plot_passenger_ranking(
+        PASSENGERS_PATH,
+        OUT_DIR / "ranking_passageiros.png",
+        top_n=10
     )
 
-    plot_ego_density_histogram(
-        EGO_PATH,
-        OUT_DIR / "histograma_ego_densidade.png"
+    plot_passengers_by_region(
+        PASSENGERS_PATH,
+        REGIOES_PATH,
+        AIRPORTS_PATH,
+        GRAUS_PATH,
+        OUT_DIR / "passageiros_por_regiao.png"
+    )
+
+    plot_degree_vs_passengers(
+        GRAUS_PATH,
+        PASSENGERS_PATH,
+        OUT_DIR / "grau_x_passageiros.png"
     )
 
     plot_top_ego_density(
@@ -665,13 +753,11 @@ def main() -> None:
         top_n=10
     )
 
-    plot_bfs_layers(
-        OUT_DIR / "camadas_bfs_rec.png",
-        start="REC"
-    )
-
-    plot_route_tree(
-        OUT_DIR / "arvore_percurso.png"
+    plot_passengers_per_connection(
+        GRAUS_PATH,
+        PASSENGERS_PATH,
+        OUT_DIR / "passageiros_por_conexao.png",
+        top_n=10
     )
 
     generate_visualization_notes(

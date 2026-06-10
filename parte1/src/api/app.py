@@ -394,65 +394,153 @@ def conexoes_aeroporto(iata):
     })
 
 
-@app.route("/api/insights", methods=["GET"])
-def insights():
-    global_data = read_json(GLOBAL_PATH)
-    regioes = read_json(REGIOES_PATH)
+def format_decimal_br(value, decimal_places=1):
+    return f"{value:.{decimal_places}f}".replace(".", ",")
 
+
+def build_dashboard_insights():
+    global_data = read_json(GLOBAL_PATH)
     graus_df = pd.read_csv(GRAUS_PATH)
     ego_df = pd.read_csv(EGO_PATH)
+    analytics = build_passenger_analytics()
 
-    mais_conectado = graus_df.sort_values(
-        by="grau",
-        ascending=False
+    graus_df["grau"] = graus_df["grau"].astype(int)
+    ego_df["grau"] = ego_df["grau"].astype(int)
+    ego_df["densidade_ego"] = ego_df["densidade_ego"].astype(float)
+
+    hub = graus_df.sort_values(
+        by=["grau", "aeroporto"],
+        ascending=[False, True]
     ).iloc[0]
 
-    maior_densidade_ego = ego_df.sort_values(
-        by="densidade_ego",
-        ascending=False
-    ).iloc[0]
+    ranking_passageiros = analytics["ranking_passageiros"]
+    lider_passageiros = ranking_passageiros[0]
+    segundo_passageiros = ranking_passageiros[1]
 
-    regiao_mais_densa = sorted(
-        regioes,
-        key=lambda item: item["densidade"],
-        reverse=True
-    )[0]
+    regioes = analytics["passageiros_por_regiao"]
+    lider_regional = regioes[0]
+    total_regional = sum(item["passageiros_milhoes"] for item in regioes)
+    participacao_regional = (
+        lider_regional["passageiros_milhoes"] / total_regional * 100
+        if total_regional else 0
+    )
 
-    return jsonify({
-        "estrutura_global": {
-            "ordem": int(global_data["ordem"]),
-            "tamanho": int(global_data["tamanho"]),
-            "densidade": float(global_data["densidade"]),
+    comparativo_df = pd.DataFrame(analytics["grau_x_passageiros"])
+    correlacao = comparativo_df["grau"].corr(
+        comparativo_df["passageiros_milhoes"]
+    )
+    correlacao = 0.0 if pd.isna(correlacao) else float(correlacao)
+
+    if abs(correlacao) >= 0.7:
+        intensidade_correlacao = "forte"
+    elif abs(correlacao) >= 0.4:
+        intensidade_correlacao = "moderada"
+    else:
+        intensidade_correlacao = "fraca"
+
+    lider_por_conexao = analytics["passageiros_por_conexao"][0]
+
+    maior_densidade = float(ego_df["densidade_ego"].max())
+    lideres_ego = (
+        ego_df[ego_df["densidade_ego"] == maior_densidade]
+        .sort_values(by=["grau", "aeroporto"], ascending=[False, True])
+    )
+    destaque_ego = lideres_ego.iloc[0]
+    aeroportos_empatados = lideres_ego["aeroporto"].astype(str).tolist()
+
+    conexoes_possiveis = max(int(global_data["ordem"]) - 1, 0)
+    percentual_conexoes = (
+        int(hub["grau"]) / conexoes_possiveis * 100
+        if conexoes_possiveis else 0
+    )
+
+    return {
+        "ranking_graus": {
+            "aeroporto": str(hub["aeroporto"]),
+            "grau": int(hub["grau"]),
+            "conexoes_possiveis": conexoes_possiveis,
+            "percentual_conexoes": round(percentual_conexoes, 1),
             "interpretacao": (
-                "A densidade global indica a proporção de conexões existentes "
-                "em relação ao total máximo possível de conexões do grafo."
+                f"{hub['aeroporto']} é o principal hub estrutural: conecta-se "
+                f"diretamente a {int(hub['grau'])} dos {conexoes_possiveis} "
+                "outros aeroportos da rede."
             )
         },
-        "hub_principal": {
-            "aeroporto": str(mais_conectado["aeroporto"]),
-            "grau": int(mais_conectado["grau"]),
+        "ranking_passageiros": {
+            "aeroporto": str(lider_passageiros["iata"]),
+            "passageiros_milhoes": float(lider_passageiros["passageiros_milhoes"]),
+            "segundo_aeroporto": str(segundo_passageiros["iata"]),
+            "segundo_passageiros_milhoes": float(
+                segundo_passageiros["passageiros_milhoes"]
+            ),
+            "diferenca_milhoes": round(
+                lider_passageiros["passageiros_milhoes"]
+                - segundo_passageiros["passageiros_milhoes"],
+                1
+            ),
             "interpretacao": (
-                f"O aeroporto {mais_conectado['aeroporto']} possui o maior grau "
-                "da rede, indicando papel de hub estrutural na modelagem."
+                f"{lider_passageiros['iata']} lidera o volume de passageiros e "
+                f"supera {segundo_passageiros['iata']}, segundo colocado, por "
+                f"{format_decimal_br(lider_passageiros['passageiros_milhoes'] - segundo_passageiros['passageiros_milhoes'])} "
+                "milhões de passageiros."
             )
         },
-        "regiao_mais_densa": {
-            "regiao": str(regiao_mais_densa["regiao"]),
-            "densidade": float(regiao_mais_densa["densidade"]),
+        "passageiros_por_regiao": {
+            "regiao": str(lider_regional["regiao"]),
+            "passageiros_milhoes": float(lider_regional["passageiros_milhoes"]),
+            "participacao_percentual": round(participacao_regional, 1),
+            "aeroportos_considerados": len(analytics["grau_x_passageiros"]),
+            "aeroportos_fora_do_grafo": analytics["aeroportos_fora_do_grafo"],
             "interpretacao": (
-                "Essa região apresenta a maior conectividade interna entre os "
-                "aeroportos pertencentes ao seu subgrafo regional."
+                f"A região {lider_regional['regiao']} concentra "
+                f"{format_decimal_br(participacao_regional)}% do tráfego dos aeroportos que "
+                "possuem dados de passageiros e pertencem ao grafo."
             )
         },
-        "maior_densidade_ego": {
-            "aeroporto": str(maior_densidade_ego["aeroporto"]),
-            "densidade_ego": float(maior_densidade_ego["densidade_ego"]),
+        "grau_x_passageiros": {
+            "correlacao": round(correlacao, 4),
+            "intensidade": intensidade_correlacao,
+            "aeroporto_maior_grau": str(hub["aeroporto"]),
+            "aeroporto_maior_trafego": str(lider_passageiros["iata"]),
             "interpretacao": (
-                "A densidade ego mede o quanto o aeroporto e seus vizinhos diretos "
-                "estão interconectados localmente."
+                f"A correlação é positiva e {intensidade_correlacao}: aeroportos "
+                "mais conectados tendem a movimentar mais passageiros, mas o grau "
+                "não explica sozinho o volume de tráfego."
+            )
+        },
+        "passageiros_por_conexao": {
+            "aeroporto": str(lider_por_conexao["iata"]),
+            "passageiros_por_conexao": float(
+                lider_por_conexao["passageiros_por_conexao"]
+            ),
+            "passageiros_milhoes": float(
+                lider_por_conexao["passageiros_milhoes"]
+            ),
+            "grau": int(lider_por_conexao["grau"]),
+            "interpretacao": (
+                f"{lider_por_conexao['iata']} apresenta a maior razão de passageiros "
+                "por conexão direta, combinando tráfego elevado com poucas conexões "
+                "na rede modelada."
+            )
+        },
+        "densidade_ego": {
+            "aeroporto_destaque": str(destaque_ego["aeroporto"]),
+            "densidade_ego": maior_densidade,
+            "grau_destaque": int(destaque_ego["grau"]),
+            "aeroportos_empatados": aeroportos_empatados,
+            "interpretacao": (
+                f"{len(aeroportos_empatados)} aeroportos atingem densidade ego "
+                f"{format_decimal_br(maior_densidade)}. Entre eles, {destaque_ego['aeroporto']} "
+                "tem o maior grau, reunindo uma vizinhança totalmente conectada e "
+                "mais ampla que a dos demais empatados."
             )
         }
-    })
+    }
+
+
+@app.route("/api/insights", methods=["GET"])
+def insights():
+    return jsonify(build_dashboard_insights())
 
 @app.route("/api/passageiros", methods=["GET"])
 def passageiros():

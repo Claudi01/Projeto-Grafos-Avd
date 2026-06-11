@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Dashboard — Projeto de Grafos</title>
+
+    <link rel="stylesheet" href="/css/style.css" />
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <header class="app-header compact-header">
+        <div class="header-content">
+            <span class="eyebrow">Análise Visual</span>
+            <h1>Dashboard Analítico</h1>
+            <p>
+                Visualizações construídas a partir das métricas do grafo e dos dados
+                de tráfego de passageiros em milhões por aeroporto.
+            </p>
+        </div>
+    </header>
+
+    <nav class="navbar">
+        <a href="/">Visão Geral</a>
+        <a href="/grafo">Grafo Interativo</a>
+        <a href="/dashboard" class="active">Dashboard</a>
+        <a href="/insights">Insights</a>
+    </nav>
+
+    <main>
+        <section class="section">
+            <div class="section-title">
+                <h2>Visualizações Analíticas</h2>
+                <p>
+                    O dashboard combina propriedades estruturais do grafo com dados
+                    reais de movimentação de passageiros, permitindo comparar conectividade
+                    e relevância operacional dos aeroportos.
+                </p>
+            </div>
+
+            <div class="chart-grid">
+                <div class="chart-card">
+                    <h3>1. Ranking de graus</h3>
+                    <canvas id="chart-degrees"></canvas>
+                    <p>Aeroportos com maior número de conexões diretas, indicando hubs estruturais.</p>
+                </div>
+
+                <div class="chart-card">
+                    <h3>2. Ranking de passageiros</h3>
+                    <canvas id="chart-passengers-ranking"></canvas>
+                    <p>Aeroportos com maior tráfego anual de passageiros, em milhões.</p>
+                </div>
+
+                <div class="chart-card">
+                    <h3>3. Passageiros por região</h3>
+                    <canvas id="chart-passengers-region"></canvas>
+                    <p>Soma do tráfego de passageiros dos aeroportos agrupados por região.</p>
+                </div>
+
+                <div class="chart-card">
+                    <h3>4. Grau x passageiros</h3>
+                    <canvas id="chart-degree-passengers"></canvas>
+                    <p>Compara conectividade estrutural e movimentação real de passageiros.</p>
+                </div>
+
+                <div class="chart-card">
+                    <h3>5. Passageiros por conexão direta</h3>
+                    <canvas id="chart-passengers-per-connection"></canvas>
+                    <p>Relação entre tráfego de passageiros e quantidade de conexões do aeroporto.</p>
+                </div>
+
+                <div class="chart-card">
+                    <h3>6. Top densidade ego</h3>
+                    <canvas id="chart-ego"></canvas>
+                    <p>Aeroportos inseridos em vizinhanças locais mais interconectadas.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        Dashboard Analítico | Métricas do grafo + tráfego de passageiros
+    </footer>
+
+    <script src="/js/api.js"></script>
+    <script src="/js/dashboard.js"></script>
+    <script src="/js/dashboard-page.js"></script>
+</body>
+</html>

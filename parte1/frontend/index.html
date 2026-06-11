@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Visão Geral — Projeto de Grafos</title>
+
+    <link rel="stylesheet" href="/css/style.css" />
+</head>
+
+<body>
+    <header class="app-header">
+        <div class="header-content">
+            <span class="eyebrow">Parte 1 — Grafo de Aeroportos</span>
+            <h1>Projeto de Grafos — Aeroportos do Brasil</h1>
+        </div>
+    </header>
+
+    <nav class="navbar">
+        <a href="/" class="active">Visão Geral</a>
+        <a href="/grafo">Grafo Interativo</a>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/insights">Insights</a>
+    </nav>
+
+    <main>
+        <section class="section">
+            <div class="section-title">
+                <h2>Visão Geral da Aplicação</h2>
+            </div>
+
+            <div class="cards">
+                <div class="card">
+                    <span>Ordem do grafo</span>
+                    <strong id="metric-ordem">-</strong>
+                    <small>Número de aeroportos representados como nós</small>
+                </div>
+
+                <div class="card">
+                    <span>Tamanho do grafo</span>
+                    <strong id="metric-tamanho">-</strong>
+                    <small>Número de conexões representadas como arestas</small>
+                </div>
+
+                <div class="card">
+                    <span>Densidade global</span>
+                    <strong id="metric-densidade">-</strong>
+                    <small>Proporção de conexões existentes no grafo</small>
+                </div>
+
+                <div class="card">
+                    <span>Hub principal</span>
+                    <strong id="metric-hub">-</strong>
+                    <small id="metric-hub-detail">Maior grau da rede</small>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-title">
+                <h2>Organização da Aplicação</h2>
+            </div>
+
+            <div class="page-grid">
+                <a href="/grafo" class="page-card">
+                    <span>01</span>
+                    <h3>Grafo Interativo</h3>
+                    <p>
+                        Visualize os aeroportos no mapa do Brasil, filtre por região,
+                        clique em aeroportos e calcule rotas.
+                    </p>
+                </a>
+
+                <a href="/dashboard" class="page-card">
+                    <span>02</span>
+                    <h3>Dashboard Analítico</h3>
+                    <p>
+                        Analise a conectividade dos aeroportos em conjunto com dados de tráfego de passageiros,
+                        comparando hubs estruturais, movimentação por região e relação entre grau e demanda.
+                    </p>
+                </a>
+
+                <a href="/insights" class="page-card">
+                    <span>03</span>
+                    <h3>Insights</h3>
+                    <p>
+                        Consulte interpretações automáticas sobre hubs, densidade,
+                        regiões e conectividade local.
+                    </p>
+                </a>
+            </div>
+        </section>
+    <script src="/js/api.js"></script>
+    <script src="/js/main.js"></script>
+</body>
+</html>

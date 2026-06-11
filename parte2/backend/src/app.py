@@ -1,4 +1,6 @@
 import json
+import csv
+from collections import defaultdict
 from pathlib import Path
 from flask import Flask, jsonify, request
 from flask_cors import CORS
@@ -14,7 +16,6 @@ grafo = build_tmdb_graph("data/tmdb_5000_credits.csv", threshold=2)
 
 @app.route('/api/grafo', methods=['GET'])
 def get_grafo():
-    # carregar todos os nós
     nos_relevantes = sorted(grafo.nodes(), key=lambda n: grafo.degree(n), reverse=True)[:5000] 
     
     nodes = [{"id": n, "label": grafo.get_node_attrs(n).get("title", n)} for n in nos_relevantes]
@@ -86,6 +87,65 @@ def get_report():
         return jsonify({
             "details": f"Erro interno ao ler o arquivo JSON: {str(e)}"
         }), 500
+
+@app.route('/api/dataset_insights', methods=['GET'])
+def get_dataset_insights():
+    caminho_csv = Path(__file__).resolve().parent.parent / "data" / "tmdb_5000_credits.csv"
+    
+    ator_freq = defaultdict(int)
+    distribuicao = []
+    total_cast = 0
+    total_crew = 0
+    
+    if not caminho_csv.exists():
+        return jsonify({"details": "Dataset tmdb_5000_credits.csv não encontrado."}), 404
+        
+    try:
+        with open(caminho_csv, "r", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                title = row.get("title", "Desconhecido")
+                try:
+                    cast_data = json.loads(row.get("cast", "[]"))
+                    crew_data = json.loads(row.get("crew", "[]"))
+                except:
+                    cast_data = []
+                    crew_data = []
+                    
+                cast_size = len(cast_data)
+                crew_size = len(crew_data)
+                
+                total_cast += cast_size
+                total_crew += crew_size
+                
+                if cast_size > 0 or crew_size > 0:
+                    distribuicao.append({
+                        "title": title,
+                        "cast_size": cast_size,
+                        "crew_size": crew_size
+                    })
+                    
+                for ator in cast_data:
+                    ator_freq[ator.get("name", "Desconhecido")] += 1
+                    
+        top_atores = sorted(ator_freq.items(), key=lambda x: x[1], reverse=True)[:10]
+        top_atores_formatado = [{"ator": k, "filmes": v} for k, v in top_atores]
+        
+        distribuicao.sort(key=lambda x: x["cast_size"] + x["crew_size"], reverse=True)
+        distribuicao_amostra = distribuicao[:100]
+        
+        proporcao = [
+            {"name": "Elenco (Cast)", "value": total_cast},
+            {"name": "Equipe Técnica (Crew)", "value": total_crew}
+        ]
+        
+        return jsonify({
+            "top_atores": top_atores_formatado,
+            "distribuicao": distribuicao_amostra,
+            "proporcao": proporcao
+        })
+    except Exception as e:
+        return jsonify({"details": f"Erro ao processar insights: {str(e)}"}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

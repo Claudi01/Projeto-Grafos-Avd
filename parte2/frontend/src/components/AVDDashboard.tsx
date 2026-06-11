@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, 
-  ScatterChart, Scatter, ZAxis 
+  ScatterChart, Scatter, ZAxis, PieChart, Pie, Cell 
 } from 'recharts';
 
 interface ReportData {
@@ -20,13 +20,20 @@ interface ReportData {
 
 const AVDDashboard: React.FC = () => {
   const [report, setReport] = useState<ReportData | null>(null);
+  const [insights, setInsights] = useState<any>(null);
   const [errorDetails, setErrorDetails] = useState<string | null>(null);
 
+  const PIE_COLORS = ['#f5c518', '#3b82f6']; 
+
   useEffect(() => {
-    axios.get('http://127.0.0.1:5000/api/report')
-      .then(res => {
-        if (res.data && res.data.dataset_info) {
-          setReport(res.data);
+    Promise.all([
+      axios.get('http://127.0.0.1:5000/api/report'),
+      axios.get('http://127.0.0.1:5000/api/dataset_insights') 
+    ])
+      .then(([resReport, resInsights]) => {
+        if (resReport.data && resReport.data.dataset_info) {
+          setReport(resReport.data);
+          setInsights(resInsights.data);
           setErrorDetails(null);
         } else {
           setErrorDetails("O formato dos dados retornados pela API é inválido.");
@@ -53,10 +60,10 @@ const AVDDashboard: React.FC = () => {
     );
   }
 
-  if (!report || !report.bfs || !report.dfs || !report.dijkstra || !report.bellman_ford) {
+  if (!report || !insights || !report.bfs || !report.dfs || !report.dijkstra || !report.bellman_ford) {
     return (
       <div className="flex-1 flex items-center justify-center h-full bg-black text-gray-400 text-lg">
-        Carregando painel analítico...
+        A carregar painel analítico e dataset...
       </div>
     );
   }
@@ -95,7 +102,7 @@ const AVDDashboard: React.FC = () => {
   return (
     <div className="flex-1 overflow-y-auto p-8 bg-black text-white min-h-screen pb-24">
       <h1 className="text-4xl font-extrabold text-yellow-500 mb-2">Análise de Dados e Benchmarking</h1>
-      <p className="text-gray-400 mb-10 text-base">Painel comparativo de performance dos algoritmos em grafos.</p>
+      <p className="text-gray-400 mb-10 text-base">Painel comparativo do dataset e performance dos algoritmos.</p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
         <div className="bg-gray-900 border border-gray-800 p-6 rounded-xl shadow-md">
@@ -116,6 +123,7 @@ const AVDDashboard: React.FC = () => {
         </div>
       </div>
 
+      <h2 className="text-2xl font-bold text-gray-200 mb-6 border-b border-gray-800 pb-2">Desempenho dos Algoritmos (Benchmark)</h2>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
         
         <div className="bg-gray-900 border border-gray-800 p-6 rounded-xl h-[450px] flex flex-col">
@@ -177,6 +185,66 @@ const AVDDashboard: React.FC = () => {
                 <Tooltip contentStyle={{ backgroundColor: '#111', borderColor: '#333' }} />
                 <Bar dataKey="tempo" name="Tempo Despendido (ms)" fill="#8b5cf6" radius={[6, 6, 0, 0]} />
               </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+      </div>
+      <h2 className="text-2xl font-bold text-gray-200 mb-6 border-b border-gray-800 pb-2">Estatísticas do Dataset IMDb</h2>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+        
+        <div className="bg-gray-900 border border-gray-800 p-6 rounded-xl h-[450px] flex flex-col">
+          <h3 className="text-lg font-bold text-gray-200 mb-4 tracking-wide text-center">Proporção: Atores vs Equipe Técnica</h3>
+          <div className="flex-1 min-h-0">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie 
+                  data={insights.proporcao} 
+                  cx="50%" cy="50%" 
+                  innerRadius={70} 
+                  outerRadius={120} 
+                  dataKey="value" 
+                  nameKey="name" 
+                  label
+                >
+                  {insights.proporcao.map((entry: any, index: number) => (
+                    <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip contentStyle={{ backgroundColor: '#111', borderColor: '#333' }} />
+                <Legend verticalAlign="bottom" height={36} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="bg-gray-900 border border-gray-800 p-6 rounded-xl h-[450px] flex flex-col lg:col-span-2">
+          <h3 className="text-lg font-bold text-gray-200 mb-4 tracking-wide">Top 10 Atores Mais Conectados (Hubs)</h3>
+          <div className="flex-1 min-h-0">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={insights.top_atores} layout="vertical" margin={{ top: 5, right: 30, left: 60, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#222" />
+                <XAxis type="number" stroke="#888" />
+                <YAxis dataKey="ator" type="category" stroke="#e5e7eb" width={100} tick={{fontSize: 12}} />
+                <Tooltip contentStyle={{ backgroundColor: '#111', borderColor: '#333' }} />
+                <Bar dataKey="filmes" name="Qtd. Filmes" fill="#f5c518" radius={[0, 4, 4, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="bg-gray-900 border border-gray-800 p-6 rounded-xl h-[450px] flex flex-col lg:col-span-3">
+          <h3 className="text-lg font-bold text-gray-200 mb-4 tracking-wide">Densidade por Filme: Elenco vs Equipe (Amostra 100 maiores)</h3>
+          <div className="flex-1 min-h-0">
+            <ResponsiveContainer width="100%" height="100%">
+              <ScatterChart margin={{ top: 10, right: 20, bottom: 10, left: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#222" />
+                <XAxis dataKey="cast_size" type="number" name="Tamanho do Elenco" stroke="#888" />
+                <YAxis dataKey="crew_size" type="number" name="Membros da Equipe" stroke="#888" />
+                <ZAxis dataKey="title" type="category" name="Filme" />
+                <Tooltip cursor={{ strokeDasharray: '3 3' }} contentStyle={{ backgroundColor: '#111', borderColor: '#333' }} />
+                <Scatter data={insights.distribuicao} fill="#8b5cf6" opacity={0.7} />
+              </ScatterChart>
             </ResponsiveContainer>
           </div>
         </div>

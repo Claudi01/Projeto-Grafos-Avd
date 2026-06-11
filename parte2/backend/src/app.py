@@ -97,6 +97,11 @@ def get_dataset_insights():
     total_cast = 0
     total_crew = 0
     
+    genero_cast = {0: 0, 1: 0, 2: 0}
+    genero_crew = {0: 0, 1: 0, 2: 0}
+    dept_freq = defaultdict(int)
+    crew_freq = defaultdict(int)
+    
     if not caminho_csv.exists():
         return jsonify({"details": "Dataset tmdb_5000_credits.csv não encontrado."}), 404
         
@@ -127,22 +132,41 @@ def get_dataset_insights():
                     
                 for ator in cast_data:
                     ator_freq[ator.get("name", "Desconhecido")] += 1
+                    genero_cast[ator.get("gender", 0)] += 1 
+                    
+                for membro in crew_data:
+                    crew_freq[membro.get("name", "Desconhecido")] += 1
+                    dept_freq[membro.get("department", "Desconhecido")] += 1
+                    genero_crew[membro.get("gender", 0)] += 1
                     
         top_atores = sorted(ator_freq.items(), key=lambda x: x[1], reverse=True)[:10]
         top_atores_formatado = [{"ator": k, "filmes": v} for k, v in top_atores]
+        
+        top_crew = sorted(crew_freq.items(), key=lambda x: x[1], reverse=True)[:10]
+        top_crew_formatado = [{"nome": k, "trabalhos": v} for k, v in top_crew]
+        
+        dept_formatado = [{"departamento": k, "total": v} for k, v in sorted(dept_freq.items(), key=lambda x: x[1], reverse=True)]
+        
+        genero_formatado = [
+            {"categoria": "Elenco", "Feminino": genero_cast.get(1, 0), "Masculino": genero_cast.get(2, 0), "Não Informado": genero_cast.get(0, 0)},
+            {"categoria": "Equipe Técnica", "Feminino": genero_crew.get(1, 0), "Masculino": genero_crew.get(2, 0), "Não Informado": genero_crew.get(0, 0)}
+        ]
         
         distribuicao.sort(key=lambda x: x["cast_size"] + x["crew_size"], reverse=True)
         distribuicao_amostra = distribuicao[:100]
         
         proporcao = [
             {"name": "Elenco (Cast)", "value": total_cast},
-            {"name": "Equipe Técnica (Crew)", "value": total_crew}
+            {"name": "Equipe Técnica (Crew)", "value": total_crew} 
         ]
         
         return jsonify({
             "top_atores": top_atores_formatado,
             "distribuicao": distribuicao_amostra,
-            "proporcao": proporcao
+            "proporcao": proporcao,
+            "top_crew": top_crew_formatado, 
+            "departamentos": dept_formatado,
+            "genero": genero_formatado
         })
     except Exception as e:
         return jsonify({"details": f"Erro ao processar insights: {str(e)}"}), 500

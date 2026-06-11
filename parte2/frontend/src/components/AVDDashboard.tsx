@@ -24,6 +24,7 @@ const AVDDashboard: React.FC = () => {
   const [errorDetails, setErrorDetails] = useState<string | null>(null);
 
   const PIE_COLORS = ['#f5c518', '#3b82f6']; 
+  const DEPT_COLORS = ['#f5c518', '#3b82f6', '#ef4444', '#10b981', '#8b5cf6', '#f97316', '#06b6d4', '#ec4899', '#84cc16', '#64748b'];
 
   useEffect(() => {
     Promise.all([
@@ -99,6 +100,8 @@ const AVDDashboard: React.FC = () => {
     tempo: Number((dados.tempo_ms || 0).toFixed(2))
   }));
 
+  const topDepartamentos = insights.departamentos ? insights.departamentos.slice(0, 7) : [];
+
   return (
     <div className="flex-1 overflow-y-auto p-8 bg-black text-white min-h-screen pb-24">
       <h1 className="text-4xl font-extrabold text-yellow-500 mb-2">Análise de Dados e Benchmarking</h1>
@@ -124,7 +127,7 @@ const AVDDashboard: React.FC = () => {
       </div>
 
       <h2 className="text-2xl font-bold text-gray-200 mb-6 border-b border-gray-800 pb-2">Desempenho dos Algoritmos (Benchmark)</h2>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
         
         <div className="bg-gray-900 border border-gray-800 p-6 rounded-xl h-[450px] flex flex-col">
           <h3 className="text-xl font-bold text-gray-200 mb-6 tracking-wide">Média Global de Tempo por Algoritmo (ms)</h3>
@@ -190,9 +193,11 @@ const AVDDashboard: React.FC = () => {
         </div>
 
       </div>
+
       <h2 className="text-2xl font-bold text-gray-200 mb-6 border-b border-gray-800 pb-2">Estatísticas do Dataset IMDb</h2>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
         
+        {/* LINHA 1 */}
         <div className="bg-gray-900 border border-gray-800 p-6 rounded-xl h-[450px] flex flex-col">
           <h3 className="text-lg font-bold text-gray-200 mb-4 tracking-wide text-center">Proporção: Atores vs Equipe Técnica</h3>
           <div className="flex-1 min-h-0">
@@ -233,7 +238,66 @@ const AVDDashboard: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-gray-900 border border-gray-800 p-6 rounded-xl h-[450px] flex flex-col lg:col-span-3">
+        {/* LINHA 2 */}
+        <div className="bg-gray-900 border border-gray-800 p-6 rounded-xl h-[450px] flex flex-col">
+          <h3 className="text-lg font-bold text-gray-200 mb-4 tracking-wide text-center">Desigualdade de Gênero</h3>
+          <div className="flex-1 min-h-0">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={insights.genero} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#222" />
+                <XAxis dataKey="categoria" stroke="#888" />
+                <YAxis stroke="#888" />
+                <Tooltip contentStyle={{ backgroundColor: '#111', borderColor: '#333' }} />
+                <Legend verticalAlign="bottom" height={36} />
+                <Bar dataKey="Masculino" stackId="a" fill="#3b82f6" />
+                <Bar dataKey="Feminino" stackId="a" fill="#ec4899" />
+                <Bar dataKey="Não Informado" stackId="a" fill="#64748b" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="bg-gray-900 border border-gray-800 p-6 rounded-xl h-[450px] flex flex-col lg:col-span-2">
+          <h3 className="text-lg font-bold text-gray-200 mb-4 tracking-wide">Mestres dos Bastidores (Top 10 Equipe Técnica)</h3>
+          <div className="flex-1 min-h-0">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={insights.top_crew} layout="vertical" margin={{ top: 5, right: 30, left: 60, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#222" />
+                <XAxis type="number" stroke="#888" />
+                <YAxis dataKey="nome" type="category" stroke="#e5e7eb" width={100} tick={{fontSize: 12}} />
+                <Tooltip contentStyle={{ backgroundColor: '#111', borderColor: '#333' }} />
+                <Bar dataKey="trabalhos" name="Qtd. Trabalhos" fill="#10b981" radius={[0, 4, 4, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* LINHA 3 */}
+        <div className="bg-gray-900 border border-gray-800 p-6 rounded-xl h-[450px] flex flex-col">
+          <h3 className="text-lg font-bold text-gray-200 mb-4 tracking-wide text-center">Distribuição Técnica (Top 7)</h3>
+          <div className="flex-1 min-h-0 flex items-center justify-center">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie 
+                  data={topDepartamentos} 
+                  cx="50%" cy="50%" 
+                  innerRadius={60} 
+                  outerRadius={100} 
+                  dataKey="total" 
+                  nameKey="departamento"
+                >
+                  {topDepartamentos.map((entry: any, index: number) => (
+                    <Cell key={`cell-${index}`} fill={DEPT_COLORS[index % DEPT_COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip contentStyle={{ backgroundColor: '#111', borderColor: '#333' }} />
+                <Legend layout="horizontal" verticalAlign="bottom" wrapperStyle={{ fontSize: '11px' }} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="bg-gray-900 border border-gray-800 p-6 rounded-xl h-[450px] flex flex-col lg:col-span-2">
           <h3 className="text-lg font-bold text-gray-200 mb-4 tracking-wide">Densidade por Filme: Elenco vs Equipe (Amostra 100 maiores)</h3>
           <div className="flex-1 min-h-0">
             <ResponsiveContainer width="100%" height="100%">

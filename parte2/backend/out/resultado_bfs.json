@@ -1,0 +1,8 @@
+{
+    "algoritmo": "BFS",
+    "origem": "603",
+    "destino": null,
+    "nos_alcancados": 4590,
+    "camada_maxima": 7,
+    "tempo_execucao_ms": 19.794600004388485
+}

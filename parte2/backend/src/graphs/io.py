@@ -4,8 +4,9 @@ import ast
 from collections import defaultdict
 from src.graphs.graph import Graph
 
-def build_tmdb_graph(path_tmdb: str, threshold: int = 2):
+TOP_K = 10  # peso max
 
+def build_tmdb_graph(path_tmdb: str, threshold: int = 1, max_edges: int = 200000): 
     df = pd.read_csv(path_tmdb)
 
     if 'title' not in df.columns or 'cast' not in df.columns or 'movie_id' not in df.columns:
@@ -14,7 +15,6 @@ def build_tmdb_graph(path_tmdb: str, threshold: int = 2):
     graph = Graph(directed=False)
 
     actor_movies = defaultdict(list)
-    
     movie_titles = {}
 
     print("Lendo CSV e mapeando nós...")
@@ -41,11 +41,14 @@ def build_tmdb_graph(path_tmdb: str, threshold: int = 2):
         if not isinstance(cast_data, list):
             continue
 
-        for actor in cast_data:
+        for actor in cast_data[:TOP_K]:  
             if isinstance(actor, dict) and 'name' in actor:
                 actor_name = str(actor['name']).strip()
                 if actor_name:
                     actor_movies[actor_name].append(movie_id_str)
+
+    # GRUDA O DICIONÁRIO DE TÍTULOS NO OBJETO GRAPH PARA O CLI ACESSAR SEM ERROS
+    graph.movie_titles = movie_titles
 
     print("Calculando interseções e construindo arestas...")
     movie_pair_counts = defaultdict(lambda: defaultdict(int))
@@ -62,7 +65,12 @@ def build_tmdb_graph(path_tmdb: str, threshold: int = 2):
     for u, neighbors in movie_pair_counts.items():
         for v, shared_actors in neighbors.items():
             if shared_actors >= threshold:
-                peso = round(1.0 / shared_actors, 4)
+                
+                # TRAVA DE SEGURANÇA: LIMITE DE 200 MIL ARESTAS
+                if edges_added >= max_edges:
+                    break
+                    
+                peso = shared_actors  
                 graph.add_edge(
                     u, v, 
                     peso=peso, 
@@ -70,6 +78,10 @@ def build_tmdb_graph(path_tmdb: str, threshold: int = 2):
                     tipo_conexao="elenco_compartilhado"
                 )
                 edges_added += 1
+                
+        if edges_added >= max_edges:
+            print(f"⚠️ Limite máximo de segurança ({max_edges} arestas) atingido!")
+            break
 
     print(f"Grafo construído com sucesso: {graph.order()} nós e {graph.size()} arestas.")
     return graph

@@ -1,0 +1,13 @@
+{
+    "algoritmo": "DIJKSTRA",
+    "origem": "603",
+    "destino": "19995",
+    "custo": 3.0,
+    "caminho": [
+        "603",
+        "859",
+        "10050",
+        "19995"
+    ],
+    "tempo_execucao_ms": 96.04849999959697
+}

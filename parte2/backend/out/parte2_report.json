@@ -1,0 +1,636 @@
+{
+    "dataset_info": {
+        "ordem": 4803,
+        "tamanho": 149537,
+        "total_atores": 9606,
+        "tempo_construcao_ms": 3800
+    },
+    "bfs": [
+        {
+            "fonte": "8966",
+            "tempo_ms": 19.19359999919834,
+            "nos_alcancados": 4590
+        },
+        {
+            "fonte": "573",
+            "tempo_ms": 18.260699998791097,
+            "nos_alcancados": 4590
+        },
+        {
+            "fonte": "10894",
+            "tempo_ms": 17.730800000208546,
+            "nos_alcancados": 4590
+        },
+        {
+            "fonte": "13495",
+            "tempo_ms": 17.920000000231084,
+            "nos_alcancados": 4590
+        },
+        {
+            "fonte": "2454",
+            "tempo_ms": 19.23739999983809,
+            "nos_alcancados": 4590
+        }
+    ],
+    "dfs": [
+        {
+            "fonte": "8966",
+            "tempo_ms": 22.79101343066818,
+            "nos_visitados": 4590
+        },
+        {
+            "fonte": "573",
+            "tempo_ms": 14.130821854429136,
+            "nos_visitados": 4590
+        },
+        {
+            "fonte": "10894",
+            "tempo_ms": 13.145809831202488,
+            "nos_visitados": 4590
+        },
+        {
+            "fonte": "13495",
+            "tempo_ms": 16.202677082693878,
+            "nos_visitados": 4590
+        },
+        {
+            "fonte": "2454",
+            "tempo_ms": 18.662514655842465,
+            "nos_visitados": 4590
+        }
+    ],
+    "dijkstra": [
+        {
+            "origem": "113406",
+            "destino": "120467",
+            "tempo_ms": 17.12423364719374,
+            "custo": 2.0,
+            "tamanho_caminho": 3
+        },
+        {
+            "origem": "2501",
+            "destino": "5038",
+            "tempo_ms": 65.7235802540919,
+            "custo": 2.0,
+            "tamanho_caminho": 3
+        },
+        {
+            "origem": "10641",
+            "destino": "11644",
+            "tempo_ms": 18.521403325675482,
+            "custo": 2.0,
+            "tamanho_caminho": 3
+        },
+        {
+            "origem": "44214",
+            "destino": "17708",
+            "tempo_ms": 30.263976142849646,
+            "custo": 2.0,
+            "tamanho_caminho": 3
+        },
+        {
+            "origem": "9466",
+            "destino": "423",
+            "tempo_ms": 61.551189367141156,
+            "custo": 2.0,
+            "tamanho_caminho": 3
+        },
+        {
+            "origem": "245703",
+            "destino": "140300",
+            "tempo_ms": 23.454873863748123,
+            "custo": 2.0,
+            "tamanho_caminho": 3
+        },
+        {
+            "origem": "1997",
+            "destino": "12245",
+            "tempo_ms": 14.007057185783957,
+            "custo": 2.0,
+            "tamanho_caminho": 3
+        },
+        {
+            "origem": "17264",
+            "destino": "10431",
+            "tempo_ms": 10.165920329891332,
+            "custo": 2.0,
+            "tamanho_caminho": 3
+        },
+        {
+            "origem": "223702",
+            "destino": "10199",
+            "tempo_ms": 13.062211515908857,
+            "custo": 2.0,
+            "tamanho_caminho": 3
+        },
+        {
+            "origem": "24803",
+            "destino": "38356",
+            "tempo_ms": 58.43921506823161,
+            "custo": 2.0,
+            "tamanho_caminho": 3
+        },
+        {
+            "origem": "87818",
+            "destino": "11969",
+            "tempo_ms": 23.700405903117932,
+            "custo": 2.0,
+            "tamanho_caminho": 3
+        },
+        {
+            "origem": "36643",
+            "destino": "9489",
+            "tempo_ms": 78.4858131774065,
+            "custo": 2.0,
+            "tamanho_caminho": 3
+        },
+        {
+            "origem": "1430",
+            "destino": "34106",
+            "tempo_ms": 18.254144890834652,
+            "custo": 2.0,
+            "tamanho_caminho": 3
+        },
+        {
+            "origem": "6171",
+            "destino": "11322",
+            "tempo_ms": 17.959205129604197,
+            "custo": 2.0,
+            "tamanho_caminho": 3
+        },
+        {
+            "origem": "31306",
+            "destino": "115",
+            "tempo_ms": 19.067752671864813,
+            "custo": 2.0,
+            "tamanho_caminho": 3
+        },
+        {
+            "origem": "87825",
+            "destino": "17577",
+            "tempo_ms": 31.916606893547545,
+            "custo": 2.0,
+            "tamanho_caminho": 3
+        },
+        {
+            "origem": "8367",
+            "destino": "2757",
+            "tempo_ms": 48.25261031495717,
+            "custo": 2.0,
+            "tamanho_caminho": 3
+        },
+        {
+            "origem": "3877",
+            "destino": "11096",
+            "tempo_ms": 14.652491251600818,
+            "custo": 2.0,
+            "tamanho_caminho": 3
+        },
+        {
+            "origem": "252512",
+            "destino": "6957",
+            "tempo_ms": 67.02139145275592,
+            "custo": 2.0,
+            "tamanho_caminho": 3
+        },
+        {
+            "origem": "9389",
+            "destino": "89325",
+            "tempo_ms": 64.4749422235848,
+            "custo": 2.0,
+            "tamanho_caminho": 3
+        },
+        {
+            "origem": "1954",
+            "destino": "9566",
+            "tempo_ms": 77.67772505288605,
+            "custo": 2.0,
+            "tamanho_caminho": 3
+        },
+        {
+            "origem": "13158",
+            "destino": "1636",
+            "tempo_ms": 18.32888690498723,
+            "custo": 2.0,
+            "tamanho_caminho": 3
+        },
+        {
+            "origem": "12227",
+            "destino": "43090",
+            "tempo_ms": 44.022236853608575,
+            "custo": 2.0,
+            "tamanho_caminho": 3
+        },
+        {
+            "origem": "10074",
+            "destino": "11322",
+            "tempo_ms": 15.870419227253608,
+            "custo": 2.0,
+            "tamanho_caminho": 3
+        },
+        {
+            "origem": "65754",
+            "destino": "17709",
+            "tempo_ms": 30.459869357378544,
+            "custo": 2.0,
+            "tamanho_caminho": 3
+        },
+        {
+            "origem": "271718",
+            "destino": "12183",
+            "tempo_ms": 15.529522053826957,
+            "custo": 2.0,
+            "tamanho_caminho": 3
+        },
+        {
+            "origem": "9279",
+            "destino": "14976",
+            "tempo_ms": 21.13279739713189,
+            "custo": 2.0,
+            "tamanho_caminho": 3
+        },
+        {
+            "origem": "86834",
+            "destino": "49017",
+            "tempo_ms": 61.31781573762571,
+            "custo": 2.0,
+            "tamanho_caminho": 3
+        },
+        {
+            "origem": "45650",
+            "destino": "27342",
+            "tempo_ms": 25.474712997066177,
+            "custo": 2.0,
+            "tamanho_caminho": 3
+        },
+        {
+            "origem": "20309",
+            "destino": "301325",
+            "tempo_ms": 47.28303236006366,
+            "custo": 2.0,
+            "tamanho_caminho": 3
+        },
+        {
+            "origem": "37799",
+            "destino": "239678",
+            "tempo_ms": 36.47075985257279,
+            "custo": 2.0,
+            "tamanho_caminho": 3
+        },
+        {
+            "origem": "226354",
+            "destino": "4970",
+            "tempo_ms": 29.378547488499585,
+            "custo": 2.0,
+            "tamanho_caminho": 3
+        },
+        {
+            "origem": "1637",
+            "destino": "12149",
+            "tempo_ms": 21.812762316074345,
+            "custo": 2.0,
+            "tamanho_caminho": 3
+        },
+        {
+            "origem": "87567",
+            "destino": "58574",
+            "tempo_ms": 70.56686784365532,
+            "custo": 2.0,
+            "tamanho_caminho": 3
+        },
+        {
+            "origem": "10350",
+            "destino": "2642",
+            "tempo_ms": 34.61178431266837,
+            "custo": 2.0,
+            "tamanho_caminho": 3
+        },
+        {
+            "origem": "2140",
+            "destino": "50780",
+            "tempo_ms": 36.341816107117054,
+            "custo": 2.0,
+            "tamanho_caminho": 3
+        },
+        {
+            "origem": "31909",
+            "destino": "10972",
+            "tempo_ms": 49.79216320035489,
+            "custo": 3.0,
+            "tamanho_caminho": 4
+        },
+        {
+            "origem": "11022",
+            "destino": "24418",
+            "tempo_ms": 96.93392904053137,
+            "custo": 3.0,
+            "tamanho_caminho": 4
+        },
+        {
+            "origem": "1646",
+            "destino": "24748",
+            "tempo_ms": 100.94504231894848,
+            "custo": 3.0,
+            "tamanho_caminho": 4
+        },
+        {
+            "origem": "14474",
+            "destino": "61891",
+            "tempo_ms": 112.81764400220334,
+            "custo": 3.0,
+            "tamanho_caminho": 4
+        },
+        {
+            "origem": "62630",
+            "destino": "9625",
+            "tempo_ms": 107.81072033911698,
+            "custo": 3.0,
+            "tamanho_caminho": 4
+        },
+        {
+            "origem": "159824",
+            "destino": "73191",
+            "tempo_ms": 109.68968237899051,
+            "custo": 3.0,
+            "tamanho_caminho": 4
+        },
+        {
+            "origem": "848",
+            "destino": "15045",
+            "tempo_ms": 37.069501318691565,
+            "custo": 3.0,
+            "tamanho_caminho": 4
+        },
+        {
+            "origem": "266647",
+            "destino": "347548",
+            "tempo_ms": 102.30842677023615,
+            "custo": 3.0,
+            "tamanho_caminho": 4
+        },
+        {
+            "origem": "5494",
+            "destino": "152747",
+            "tempo_ms": 80.66267413502922,
+            "custo": 3.0,
+            "tamanho_caminho": 4
+        },
+        {
+            "origem": "10163",
+            "destino": "228165",
+            "tempo_ms": 83.70003597447837,
+            "custo": 3.0,
+            "tamanho_caminho": 4
+        },
+        {
+            "origem": "76758",
+            "destino": "8987",
+            "tempo_ms": 109.24718146933951,
+            "custo": 3.0,
+            "tamanho_caminho": 4
+        },
+        {
+            "origem": "24150",
+            "destino": "92182",
+            "tempo_ms": 103.75504493658826,
+            "custo": 3.0,
+            "tamanho_caminho": 4
+        },
+        {
+            "origem": "227973",
+            "destino": "18615",
+            "tempo_ms": 37.21728620301292,
+            "custo": 3.0,
+            "tamanho_caminho": 4
+        },
+        {
+            "origem": "51955",
+            "destino": "57157",
+            "tempo_ms": 78.8519847575279,
+            "custo": 3.0,
+            "tamanho_caminho": 4
+        },
+        {
+            "origem": "77948",
+            "destino": "1957",
+            "tempo_ms": 103.45356492814982,
+            "custo": 3.0,
+            "tamanho_caminho": 4
+        },
+        {
+            "origem": "16558",
+            "destino": "22787",
+            "tempo_ms": 97.29761525272863,
+            "custo": 3.0,
+            "tamanho_caminho": 4
+        },
+        {
+            "origem": "218",
+            "destino": "76492",
+            "tempo_ms": 116.1648726828188,
+            "custo": 3.0,
+            "tamanho_caminho": 4
+        },
+        {
+            "origem": "10925",
+            "destino": "2575",
+            "tempo_ms": 56.908344788910455,
+            "custo": 3.0,
+            "tamanho_caminho": 4
+        },
+        {
+            "origem": "200505",
+            "destino": "92182",
+            "tempo_ms": 113.45074704476333,
+            "custo": 3.0,
+            "tamanho_caminho": 4
+        },
+        {
+            "origem": "332285",
+            "destino": "10567",
+            "tempo_ms": 52.70692576046886,
+            "custo": 3.0,
+            "tamanho_caminho": 4
+        },
+        {
+            "origem": "14429",
+            "destino": "138103",
+            "tempo_ms": 54.6912347406325,
+            "custo": 3.0,
+            "tamanho_caminho": 4
+        },
+        {
+            "origem": "10280",
+            "destino": "253412",
+            "tempo_ms": 78.17613262807559,
+            "custo": 3.0,
+            "tamanho_caminho": 4
+        },
+        {
+            "origem": "62255",
+            "destino": "17707",
+            "tempo_ms": 65.88406669062663,
+            "custo": 3.0,
+            "tamanho_caminho": 4
+        },
+        {
+            "origem": "1685",
+            "destino": "37137",
+            "tempo_ms": 69.83562998637568,
+            "custo": 3.0,
+            "tamanho_caminho": 4
+        },
+        {
+            "origem": "2830",
+            "destino": "86837",
+            "tempo_ms": 115.38067876931079,
+            "custo": 3.0,
+            "tamanho_caminho": 4
+        },
+        {
+            "origem": "10806",
+            "destino": "58595",
+            "tempo_ms": 108.82325707768678,
+            "custo": 3.0,
+            "tamanho_caminho": 4
+        },
+        {
+            "origem": "2486",
+            "destino": "47890",
+            "tempo_ms": 103.85658092690393,
+            "custo": 3.0,
+            "tamanho_caminho": 4
+        },
+        {
+            "origem": "29963",
+            "destino": "18126",
+            "tempo_ms": 69.19755416248762,
+            "custo": 3.0,
+            "tamanho_caminho": 4
+        },
+        {
+            "origem": "46849",
+            "destino": "1893",
+            "tempo_ms": 70.58660239738114,
+            "custo": 3.0,
+            "tamanho_caminho": 4
+        },
+        {
+            "origem": "1930",
+            "destino": "10866",
+            "tempo_ms": 91.91434789166793,
+            "custo": 3.0,
+            "tamanho_caminho": 4
+        },
+        {
+            "origem": "168705",
+            "destino": "257445",
+            "tempo_ms": 97.99905184662893,
+            "custo": 3.0,
+            "tamanho_caminho": 4
+        },
+        {
+            "origem": "13074",
+            "destino": "10676",
+            "tempo_ms": 99.43998076380299,
+            "custo": 3.0,
+            "tamanho_caminho": 4
+        },
+        {
+            "origem": "7737",
+            "destino": "11954",
+            "tempo_ms": 73.41406413072379,
+            "custo": 3.0,
+            "tamanho_caminho": 4
+        },
+        {
+            "origem": "9813",
+            "destino": "28932",
+            "tempo_ms": 76.88785327364127,
+            "custo": 3.0,
+            "tamanho_caminho": 4
+        },
+        {
+            "origem": "18925",
+            "destino": "17734",
+            "tempo_ms": 69.25012732355802,
+            "custo": 4.0,
+            "tamanho_caminho": 5
+        },
+        {
+            "origem": "15173",
+            "destino": "1523",
+            "tempo_ms": 26.984897304197375,
+            "custo": 5.0,
+            "tamanho_caminho": 5
+        },
+        {
+            "origem": "10871",
+            "destino": "2786",
+            "tempo_ms": 120.70689839002529,
+            "custo": 4.0,
+            "tamanho_caminho": 5
+        },
+        {
+            "origem": "14395",
+            "destino": "244776",
+            "tempo_ms": 99.47435204432576,
+            "custo": 4.0,
+            "tamanho_caminho": 5
+        },
+        {
+            "origem": "71157",
+            "destino": "1904",
+            "tempo_ms": 78.69252676960076,
+            "custo": 4.0,
+            "tamanho_caminho": 5
+        },
+        {
+            "origem": "76489",
+            "destino": "40494",
+            "tempo_ms": 129.44716427006443,
+            "custo": 4.0,
+            "tamanho_caminho": 5
+        },
+        {
+            "origem": "46415",
+            "destino": "31174",
+            "tempo_ms": 52.37135120381867,
+            "custo": 4.0,
+            "tamanho_caminho": 5
+        },
+        {
+            "origem": "48382",
+            "destino": "15017",
+            "tempo_ms": 92.31945627679946,
+            "custo": 4.0,
+            "tamanho_caminho": 5
+        },
+        {
+            "origem": "9302",
+            "destino": "78705",
+            "tempo_ms": 115.38745948923383,
+            "custo": 5.0,
+            "tamanho_caminho": 5
+        },
+        {
+            "origem": "8357",
+            "destino": "18045",
+            "tempo_ms": 115.45260703897429,
+            "custo": 5.0,
+            "tamanho_caminho": 6
+        }
+    ],
+    "bellman_ford": {
+        "padrao": {
+            "tempo_ms": 896.5712000008352,
+            "status": "SUCESSO",
+            "custo": 3.0
+        },
+        "ciclo_negativo": {
+            "tempo_ms": 8.4,
+            "status": "CICLO DETECTADO",
+            "custo": 0
+        }
+    }
+}

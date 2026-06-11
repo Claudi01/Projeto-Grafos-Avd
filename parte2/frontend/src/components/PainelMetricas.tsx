@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 
 interface Metricas {
   ordem: number;
@@ -17,15 +17,99 @@ interface PainelMetricasProps {
   nosDisponiveis: any[];
   onBuscar: (origem: string, destino: string, algoritmo: string) => void;
   resultado: Resultado;
+  origem: string;
+  setOrigem: (val: string) => void;
+  destino: string;
+  setDestino: (val: string) => void;
 }
 
-export default function PainelMetricas({ metricas, nosDisponiveis, onBuscar, resultado }: PainelMetricasProps) {
-  const [origem, setOrigem] = useState('');
-  const [destino, setDestino] = useState('');
+const SearchableSelect = ({ options, value, onChange, placeholder }: { options: any[], value: string, onChange: (val: string) => void, placeholder: string }) => {
+  const [search, setSearch] = useState('');
+  const [isOpen, setIsOpen] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  const sortedOptions = useMemo(() => {
+    return [...options].sort((a, b) => (a.label || '').localeCompare(b.label || ''));
+  }, [options]);
+
+  const filteredOptions = useMemo(() => {
+    if (!search) return sortedOptions;
+    return sortedOptions.filter(opt => 
+      (opt.label || '').toLowerCase().includes(search.toLowerCase())
+    );
+  }, [sortedOptions, search]);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+        const selectedOpt = options.find(o => String(o.id) === String(value));
+        if (selectedOpt) setSearch(selectedOpt.label);
+        else setSearch('');
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [wrapperRef, value, options]);
+
+  useEffect(() => {
+    const selectedOpt = options.find(o => String(o.id) === String(value));
+    if (selectedOpt) setSearch(selectedOpt.label);
+  }, [value, options]);
+
+  return (
+    <div ref={wrapperRef} className="relative w-full">
+      <input
+        type="text"
+        className="w-full bg-black border border-gray-700 rounded p-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-imdb"
+        placeholder={placeholder}
+        value={search}
+        onChange={(e) => {
+          setSearch(e.target.value);
+          setIsOpen(true);
+          onChange(''); 
+        }}
+        onFocus={() => setIsOpen(true)}
+      />
+      {isOpen && (
+        <div className="absolute z-50 w-full mt-1 bg-black border border-gray-700 rounded shadow-lg max-h-60 overflow-y-auto">
+          {filteredOptions.length > 0 ? (
+            filteredOptions.map((opt) => (
+              <div
+                key={opt.id}
+                className="p-2 text-sm text-gray-200 hover:bg-gray-800 hover:text-white cursor-pointer"
+                onClick={() => {
+                  onChange(String(opt.id));
+                  setSearch(opt.label);
+                  setIsOpen(false);
+                }}
+              >
+                {opt.label}
+              </div>
+            ))
+          ) : (
+            <div className="p-2 text-sm text-gray-500">Nenhum filme encontrado.</div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default function PainelMetricas({ 
+  metricas, 
+  nosDisponiveis, 
+  onBuscar, 
+  resultado,
+  origem,
+  setOrigem,
+  destino,
+  setDestino
+}: PainelMetricasProps) {
   const [algoritmo, setAlgoritmo] = useState('bfs');
 
   return (
-    <div className="w-80 bg-darkcard p-4 flex flex-col gap-4 border-l border-gray-800 h-full overflow-y-auto">
+    <div className="w-80 bg-darkcard p-4 flex flex-col gap-4 border-l border-gray-800 h-full overflow-y-auto z-20">
       <h2 className="text-xl font-bold text-imdb">Métricas Globais</h2>
       
       <div className="grid grid-cols-2 gap-2">
@@ -43,24 +127,22 @@ export default function PainelMetricas({ metricas, nosDisponiveis, onBuscar, res
 
       <h2 className="text-xl font-bold text-imdb">Buscar Rota</h2>
       
-      <select 
-        className="bg-black border border-gray-700 rounded p-2 text-sm w-full"
-        value={origem} onChange={e => setOrigem(e.target.value)}
-      >
-        <option value="">Selecione a Origem...</option>
-        {nosDisponiveis.map(n => <option key={`orig-${n.id}`} value={n.id}>{n.label}</option>)}
-      </select>
+      <SearchableSelect 
+        options={nosDisponiveis} 
+        value={origem} 
+        onChange={setOrigem} 
+        placeholder="Digite a Origem..." 
+      />
+
+      <SearchableSelect 
+        options={nosDisponiveis} 
+        value={destino} 
+        onChange={setDestino} 
+        placeholder="Digite o Destino..." 
+      />
 
       <select 
-        className="bg-black border border-gray-700 rounded p-2 text-sm w-full"
-        value={destino} onChange={e => setDestino(e.target.value)}
-      >
-        <option value="">Selecione o Destino...</option>
-        {nosDisponiveis.map(n => <option key={`dest-${n.id}`} value={n.id}>{n.label}</option>)}
-      </select>
-
-      <select 
-        className="bg-black border border-gray-700 rounded p-2 text-sm w-full"
+        className="bg-black border border-gray-700 rounded p-2 text-sm w-full text-white"
         value={algoritmo} onChange={e => setAlgoritmo(e.target.value)}
       >
         <option value="bfs">Busca em Largura (BFS)</option>
@@ -71,7 +153,7 @@ export default function PainelMetricas({ metricas, nosDisponiveis, onBuscar, res
 
       <button 
         onClick={() => onBuscar(origem, destino, algoritmo)}
-        className="bg-imdb text-black font-bold py-2 rounded hover:bg-yellow-500 transition-colors"
+        className="bg-imdb text-black font-bold py-2 rounded hover:bg-yellow-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         disabled={!origem || !destino}
       >
         Calcular Rota

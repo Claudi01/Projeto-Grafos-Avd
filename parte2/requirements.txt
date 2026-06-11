@@ -1,0 +1,8 @@
+pandas
+pytest
+matplotlib
+pyvis
+plotly
+streamlit
+flask
+flask-cors

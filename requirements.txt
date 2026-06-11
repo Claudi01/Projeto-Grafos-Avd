@@ -6,3 +6,5 @@ plotly
 streamlit
 flask
 flask-cors
+python-dotenv
+requests

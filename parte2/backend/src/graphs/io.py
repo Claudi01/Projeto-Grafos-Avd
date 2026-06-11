@@ -23,8 +23,10 @@ def build_tmdb_graph(path_tmdb: str, threshold: int = 1, max_edges: int = 200000
         title = row['title']
         cast_str = str(row['cast'])
 
+        trailer_key = str(row['youtube_trailer_key']) if 'youtube_trailer_key' in df.columns and pd.notna(row.get('youtube_trailer_key')) else ""
+
         movie_id_str = str(movie_id)
-        graph.add_node(movie_id_str, title=title, tipo="filme")
+        graph.add_node(movie_id_str, title=title, tipo="filme", trailer=trailer_key)
         movie_titles[movie_id_str] = title
 
         if cast_str == "nan" or not cast_str.strip():
@@ -47,7 +49,6 @@ def build_tmdb_graph(path_tmdb: str, threshold: int = 1, max_edges: int = 200000
                 if actor_name:
                     actor_movies[actor_name].append(movie_id_str)
 
-    # GRUDA O DICIONÁRIO DE TÍTULOS NO OBJETO GRAPH PARA O CLI ACESSAR SEM ERROS
     graph.movie_titles = movie_titles
 
     print("Calculando interseções e construindo arestas...")
@@ -66,7 +67,6 @@ def build_tmdb_graph(path_tmdb: str, threshold: int = 1, max_edges: int = 200000
         for v, shared_actors in neighbors.items():
             if shared_actors >= threshold:
                 
-                # TRAVA DE SEGURANÇA: LIMITE DE 200 MIL ARESTAS
                 if edges_added >= max_edges:
                     break
                     

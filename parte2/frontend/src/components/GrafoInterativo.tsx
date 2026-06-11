@@ -5,6 +5,7 @@ interface Node {
   id: string | number;
   label?: string;
   val?: number;
+  trailer?: string;
   [key: string]: any;
 }
 
@@ -164,7 +165,7 @@ const GrafoInterativo: React.FC<GrafoInterativoProps> = ({
       )}
 
       {selectedNode && (
-        <div className="absolute right-4 top-4 bottom-4 w-80 bg-gray-900 bg-opacity-95 backdrop-blur-sm p-4 border border-gray-800 rounded-lg flex flex-col gap-4 z-10 shadow-2xl">
+        <div className="absolute right-4 top-4 bottom-4 w-96 bg-gray-900 bg-opacity-95 backdrop-blur-sm p-4 border border-gray-800 rounded-lg flex flex-col gap-4 z-10 shadow-2xl">
           <h2 className="text-2xl font-bold text-[#f5c518]">{selectedNode.label || 'Título Desconhecido'}</h2>
           <p className="text-sm text-gray-400 mb-2">ID: {selectedNode.id}</p>
           
@@ -183,10 +184,21 @@ const GrafoInterativo: React.FC<GrafoInterativoProps> = ({
             </button>
           </div>
 
+          {/* NOVO: Rendering do Trailer do YouTube */}
           <div className="flex-1 mt-2">
-            <div className="w-full h-40 bg-gray-800 rounded flex items-center justify-center text-gray-500">
-              Trailer (Em breve)
-            </div>
+            {selectedNode.trailer ? (
+              <iframe
+                className="w-full h-56 rounded-lg shadow-lg border border-gray-700 bg-black"
+                src={`https://www.youtube.com/embed/${selectedNode.trailer}`}
+                title="Trailer do Filme"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            ) : (
+              <div className="w-full h-56 bg-gray-800 rounded-lg flex items-center justify-center text-gray-500 border border-gray-700 text-sm">
+                Trailer indisponível
+              </div>
+            )}
           </div>
           
           <button 

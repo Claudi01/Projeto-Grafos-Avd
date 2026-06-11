@@ -12,13 +12,21 @@ from src.graphs.algorithms import bfs, dfs, dijkstra, bellman_ford_path
 app = Flask(__name__)
 CORS(app)
 
-grafo = build_tmdb_graph("data/tmdb_5000_credits.csv", threshold=2)
+grafo = build_tmdb_graph("data/tmdb_5000_credits_com_trailer.csv", threshold=2) 
 
 @app.route('/api/grafo', methods=['GET'])
 def get_grafo():
     nos_relevantes = sorted(grafo.nodes(), key=lambda n: grafo.degree(n), reverse=True)[:5000] 
     
-    nodes = [{"id": n, "label": grafo.get_node_attrs(n).get("title", n)} for n in nos_relevantes]
+    nodes = []
+    for n in nos_relevantes:
+        attrs = grafo.get_node_attrs(n)
+        nodes.append({
+            "id": n, 
+            "label": attrs.get("title", n),
+            "trailer": attrs.get("trailer", "") 
+        })
+        
     edges = []
     
     for u, v, attrs in grafo.edges():
@@ -90,7 +98,7 @@ def get_report():
 
 @app.route('/api/dataset_insights', methods=['GET'])
 def get_dataset_insights():
-    caminho_csv = Path(__file__).resolve().parent.parent / "data" / "tmdb_5000_credits.csv"
+    caminho_csv = Path(__file__).resolve().parent.parent / "data" / "tmdb_5000_credits_com_trailer.csv" 
     
     ator_freq = defaultdict(int)
     distribuicao = []
@@ -132,7 +140,7 @@ def get_dataset_insights():
                     
                 for ator in cast_data:
                     ator_freq[ator.get("name", "Desconhecido")] += 1
-                    genero_cast[ator.get("gender", 0)] += 1 
+                    genero_cast[ator.get("gender", 0)] += 1
                     
                 for membro in crew_data:
                     crew_freq[membro.get("name", "Desconhecido")] += 1
@@ -157,14 +165,14 @@ def get_dataset_insights():
         
         proporcao = [
             {"name": "Elenco (Cast)", "value": total_cast},
-            {"name": "Equipe Técnica (Crew)", "value": total_crew} 
+            {"name": "Equipe Técnica (Crew)", "value": total_crew}
         ]
         
         return jsonify({
             "top_atores": top_atores_formatado,
             "distribuicao": distribuicao_amostra,
             "proporcao": proporcao,
-            "top_crew": top_crew_formatado, 
+            "top_crew": top_crew_formatado,
             "departamentos": dept_formatado,
             "genero": genero_formatado
         })

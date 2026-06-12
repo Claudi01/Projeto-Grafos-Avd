@@ -52,6 +52,14 @@ A raiz da parte 2 e subdividida em duas pastas independentes: backend e frontend
 
 ---
 
+
+### Relatório Técnico e Manual
+Toda a documentação técnica (incluindo a modelagem, limitações, decisões de UI/UX, leis da Gestalt aplicadas e o guia de operação completo) está detalhada no relatório oficial do projeto.
+ **Você pode encontrá-lo em:**
+ ```bash
+`parte2/relatorios/`
+```
+
 ## Instrucoes de Instalacao e Execucao
 
 ### Back-end (Python e Flask)

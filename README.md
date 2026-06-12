@@ -1,58 +1,64 @@
-# Como Rodar o Projeto (Guia Atualizado)
+# Projeto de teoria dos grafos e AVD
 
-**Pré-requisitos:** Certifique-se de ter o Node.js (com a variável PATH configurada) e o Python 3.11+ instalados na sua máquina.
 
-### 1. Atualizando as Dependências
-Antes de iniciar os servidores, certifique-se de que o arquivo `requirements.txt` localizado na **raiz do projeto** (`PROJETO-GRAFOS-AVD/`) contém as seguintes bibliotecas:
-\`\`\`text
-pandas
-pytest
-matplotlib
-pyvis
-plotly
-streamlit
-flask
-flask-cors
-\`\`\`
+A raiz do projeto foi dividida de maneira modular entre parte1 e parte2. Essa separacao permitiu a atuacao eficiente em subequipes isoladas, garantindo que o progresso de cada etapa ocorresse de forma simultanea sem a ocorrencia de conflitos de mesclagem ou interferencias mutuas no codigo-fonte.
 
-### 2. Iniciando o Backend (API Flask)
-Abra o seu terminal na **raiz do projeto** e execute os seguintes comandos em ordem:
-
-\`\`\`bash
-# Entre na subpasta do backend
-cd parte2/backend
-
-# Ative o ambiente virtual
-# Se estiver no Windows: 
-.\venv\Scripts\activate
-# Se estiver no Mac/Linux: 
-source venv/bin/activate
-
-# Instale as dependências (buscando o arquivo na raiz do projeto)
-pip install -r ../../requirements.txt
-
-# Inicie o servidor como um módulo do Python
-py -m src.app
-# (Nota: se 'py' não funcionar, utilize 'python -m src.app')
-\`\`\`
-O servidor ficará rodando (geralmente em `http://127.0.0.1:5000/`). **Mantenha este terminal aberto.**
-
-### 3. Iniciando o Frontend (React/Vite)
-Abra uma **nova aba** ou um **novo terminal** (também a partir da raiz do projeto) e execute:
-
-\`\`\`bash
-# Entre na subpasta do frontend
-cd parte2/frontend
-
-# Instale as dependências do Node
-npm install
-
-# Inicie o servidor de desenvolvimento
-npm run dev
-\`\`\`
-
-**Pronto!** Agora é só segurar o `Ctrl` e clicar no link gerado no terminal do frontend (geralmente `http://localhost:5173`) ou acessar diretamente no seu navegador. O projeto estará rodando localmente com o grafo interativo e a API conectada.
+A raiz da parte 2 e subdividida em duas pastas independentes: backend e frontend. Essa divisao isola a camada de apresentacao em React da camada de servicos em Python, facilitando a manutencao e organizacao do ecossistema, ja que o react gera muitos arquivos utilitarios soltos.
 
 ---
-**Como encerrar a aplicação:**
-Para parar os servidores, basta ir em cada um dos terminais abertos e pressionar `Ctrl + C`. No terminal do backend, você também pode digitar `deactivate` para sair do ambiente virtual do Python.
+
+## Instrucoes de Instalacao e Execucao
+
+### Back-end (Python e Flask)
+
+O back-end armazena o dataset, constroi a lista de adjacencias do grafo do zero e disponibiliza endpoints de API REST para o funcionamento da aplicacao.
+
+1. Navegue ate o diretorio do back-end:
+cd parte2/backend
+
+2. Instale as dependencias necessarias:
+pip install pandas flask flask-cors pytest
+
+3. Execute o script de geracao do relatorio global (solve.py). Este script realiza o processamento massivo de rotas reais na rede para alimentar o painel estatistico:
+python -m src.solve
+
+4. Inicialize o servidor Flask para conexao com a interface grafica:
+python -m src.app
+
+---
+
+### Front-end (React, Vite e Recharts)
+
+O front-end renderiza a malha de conexoes de forma estatica a partir do layout calculado no servidor e apresenta um painel de benchmarking visual para inspecao dos algoritmos.
+
+1. Abra um novo terminal e navegue ate o diretorio do front-end:
+cd parte2/frontend
+
+2. Instale as dependencias base do projeto:
+npm install
+
+3. Instale a biblioteca de graficos Recharts necessaria para renderizar o painel de analise visual:
+npm install recharts
+
+4. Inicie a aplicacao em modo de desenvolvimento local:
+npm run dev
+
+Abra o navegador no endereco indicado no terminal (normalmente http://localhost:5173).
+
+---
+
+## Procedimentos de Auditoria e Testes
+
+### Execucao via Linha de Comando (CLI)
+
+Para testar consultas customizadas e algoritmos individuais diretamente pelo terminal do back-end, utilize o modulo cli.py fornecendo as flags obrigatorias. O parametro --out e opcional e serve para salvar a resposta estruturada na pasta out:
+
+python -m src.cli --algoritmo DIJKSTRA --origem "The Matrix" --destino "Avatar" --out ./out/
+
+Opcoes validas para a flag --algoritmo: BFS, DFS, DIJKSTRA, BELLMAN-FORD.
+
+### Execucao da Suite de Testes Automatizados
+
+Para fins de validacao das regras de consistencia logica exigidas na rubrica — como os niveis da busca em largura, a profundidade da busca em profundidade, a rejeicao de pesos negativos no Dijkstra e a interrupcao preventiva do Bellman-Ford em ciclos negativos —, execute a suite de testes automatizados com o pytest a partir da pasta backend:
+
+python -m pytest

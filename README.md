@@ -1,7 +1,52 @@
-# Projeto de teoria dos grafos e AVD
+# Projeto de Teoria dos Grafos e AVD
+
+A raiz do projeto foi dividida de maneira modular entre `parte1` e `parte2`. Essa separação permitiu a atuação eficiente em subequipes isoladas, garantindo a integridade e independência de cada etapa.
+
+---
+
+## Parte 1: Análise Estrutural da Malha Aérea Brasileira
+
+A **Parte 1** tem como foco a modelagem matemática, análise topológica e visualização de dados (AVD) da infraestrutura de aviação comercial do Brasil. 
+
+Nesta etapa, a malha de aeroportos foi modelada como um Grafo Ponderado Não-Direcionado, utilizando as distâncias geográficas reais em quilômetros como peso das arestas. O projeto processa esses dados de rotas, aplica algoritmos de travessia e de caminhos mínimos (BFS, DFS, Dijkstra, Bellman-Ford) e consolida os resultados em um Dashboard analítico responsivo e um mapa cartográfico interativo.
+
+### Relatório Técnico e Manual
+Toda a documentação técnica (incluindo a modelagem, limitações, decisões de UI/UX, leis da Gestalt aplicadas e o guia de operação completo) está detalhada no relatório oficial do projeto.
+ **Você pode encontrá-lo em:**
+ ```bash
+`parte1/relatorio/`
+```
+### Como Rodar a Parte 1 localmente
+
+A Parte 1 utiliza um backend leve em Flask (Python) para injetar os cálculos em uma interface nativa (HTML, CSS e JavaScript). Siga os passos abaixo:
+
+**1. Instale as dependências gerais**
+No terminal, abra a raiz do repositório e instale as bibliotecas requeridas:
+```bash
+pip install -r requirements.txt
+```
+2. Navegue para o ambiente da Parte 1:
+```bash
+cd parte1
+```
+3. Processe as métricas do Grafo
+Antes de iniciar a interface gráfica, execute o motor de processamento. Este script lê os dados em .csv, processa os algoritmos pesados de travessia, constrói a árvore de caminhos e gera os gráficos estáticos que vão para o Dashboard.:
+```bash
+python -m src.solve
+```
+4. Inicie o Servidor da Aplicação
+Agora, inicie o backend Flask que servirá a plataforma web:
+```bash
+python -m src.api.app
+```
+5. Acesse a plataforma
+Assim que o terminal indicar que o servidor está rodando, abra o seu navegador e acesse:
+```bash
+http://127.0.0.1:5000/
+```
 
 
-A raiz do projeto foi dividida de maneira modular entre parte1 e parte2. Essa separacao permitiu a atuacao eficiente em subequipes isoladas, garantindo que o progresso de cada etapa ocorresse de forma simultanea sem a ocorrencia de conflitos de mesclagem ou interferencias mutuas no codigo-fonte.
+## Parte 2: Grafo de Filmes Interativo (TMDB)
 
 A raiz da parte 2 e subdividida em duas pastas independentes: backend e frontend. Essa divisao isola a camada de apresentacao em React da camada de servicos em Python, facilitando a manutencao e organizacao do ecossistema, ja que o react gera muitos arquivos utilitarios soltos.
 
